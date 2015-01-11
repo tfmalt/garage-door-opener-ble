@@ -13,6 +13,8 @@
 		920E5EC61A615EAC00B0E5E3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC51A615EAC00B0E5E3 /* Images.xcassets */; };
 		920E5EC91A615EAC00B0E5E3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC71A615EAC00B0E5E3 /* LaunchScreen.xib */; };
 		920E5ED51A615EAC00B0E5E3 /* GarageOpenerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920E5ED41A615EAC00B0E5E3 /* GarageOpenerTests.swift */; };
+		926AE0E71A61D28600A19238 /* BTDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0E61A61D28600A19238 /* BTDiscovery.swift */; };
+		926AE0E81A61D28600A19238 /* BTDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0E61A61D28600A19238 /* BTDiscovery.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +38,7 @@
 		920E5ECE1A615EAC00B0E5E3 /* GarageOpenerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GarageOpenerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		920E5ED31A615EAC00B0E5E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		920E5ED41A615EAC00B0E5E3 /* GarageOpenerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageOpenerTests.swift; sourceTree = "<group>"; };
+		926AE0E61A61D28600A19238 /* BTDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTDiscovery.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +86,7 @@
 				920E5EC51A615EAC00B0E5E3 /* Images.xcassets */,
 				920E5EC71A615EAC00B0E5E3 /* LaunchScreen.xib */,
 				920E5EBC1A615EAC00B0E5E3 /* Supporting Files */,
+				926AE0E61A61D28600A19238 /* BTDiscovery.swift */,
 			);
 			path = GarageOpener;
 			sourceTree = "<group>";
@@ -213,6 +217,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				920E5EC11A615EAC00B0E5E3 /* ViewController.swift in Sources */,
+				926AE0E71A61D28600A19238 /* BTDiscovery.swift in Sources */,
 				920E5EBF1A615EAC00B0E5E3 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -221,6 +226,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				926AE0E81A61D28600A19238 /* BTDiscovery.swift in Sources */,
 				920E5ED51A615EAC00B0E5E3 /* GarageOpenerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -407,6 +413,7 @@
 				920E5EDA1A615EAC00B0E5E3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		920E5EDB1A615EAC00B0E5E3 /* Build configuration list for PBXNativeTarget "GarageOpenerTests" */ = {
 			isa = XCConfigurationList;
@@ -415,6 +422,7 @@
 				920E5EDD1A615EAC00B0E5E3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
