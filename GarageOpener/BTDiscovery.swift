@@ -11,6 +11,7 @@ import CoreBluetooth
 
 class BTDiscovery: NSObject, CBCentralManagerDelegate {
     
+    var nc = NSNotificationCenter.defaultCenter()
     private let centralManager: CBCentralManager?
     
     override init() {
@@ -60,6 +61,25 @@ class BTDiscovery: NSObject, CBCentralManagerDelegate {
         switch (central.state) {
         case CBCentralManagerState.PoweredOn:
             println("BLE Starting Scanning for device...")
+            nc.postNotificationName(
+                "bleStateChangedNotification",
+                object: "Scanning for device..."
+            )
+            break
+        case CBCentralManagerState.Unknown:
+            println("BLE state unknown")
+            break
+        case CBCentralManagerState.Resetting:
+            println("BLE state resetting")
+            break
+        case CBCentralManagerState.Unsupported:
+            println("BLE state unsupported")
+            break
+        case CBCentralManagerState.Unauthorized:
+            println("BLE state unauthorized")
+            break
+        case CBCentralManagerState.PoweredOff:
+            println("BLE state powered off")
             break
         default:
             break
