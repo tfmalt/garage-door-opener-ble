@@ -122,7 +122,18 @@ class BTService : NSObject, CBPeripheralDelegate {
     }
     
     func peripheral(peripheral: CBPeripheral!, didReadRSSI RSSI: NSNumber!, error: NSError!) {
-        println("got did read rssi: \(RSSI), peripheral: \(peripheral.RSSI)")
+        // println("got did read rssi: \(RSSI)")
+        
+        if peripheral.state != CBPeripheralState.Connected {
+            println("  Peripheral state says not connected.")
+            return
+        }
+        
+        nc.postNotificationName(
+            "btRSSIUpdateNotification",
+            object: peripheral,
+            userInfo: ["rssi": RSSI]
+        )
     }
     
     func peripheral(peripheral: CBPeripheral!, didUpdateNotificationStateForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
