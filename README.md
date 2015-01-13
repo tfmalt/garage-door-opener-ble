@@ -7,7 +7,7 @@ An iOS Swift to arduino bluetooth LE experiment.
 This is a toy experiment to interface my garage door opener with swift and an arduino uno.
 
 TODO
-====
+----
 
 DONE
 ----
