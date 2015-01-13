@@ -8,7 +8,7 @@
         <!--Garage Opener-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="GarageOpener" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Garage_Opener" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -17,17 +17,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="interactive" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4sC-Pd-ziQ">
-                                <rect key="frame" x="14" y="492" width="570" height="100"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="100" id="mXU-dE-ve3"/>
-                                </constraints>
-                                <string key="text">foo bar quux test foo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux test</string>
-                                <color key="textColor" red="0.59999999999999998" green="0.59999999999999998" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <fontDescription key="fontDescription" name="Menlo-Regular" family="Menlo" pointSize="10"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BRQ-06-O5h">
                                 <rect key="frame" x="227" y="190" width="148" height="148"/>
                                 <color key="backgroundColor" red="0.0" green="0.59999999999999998" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -47,25 +36,47 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Initalizing" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cSS-CE-NjP">
-                                <rect key="frame" x="191" y="389" width="216" height="48"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="216" id="MdV-Hb-Cv4"/>
-                                </constraints>
+                                <rect key="frame" x="191" y="374" width="216" height="48"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
-                                <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="textColor" red="0.53333333333333333" green="0.53333333333333333" blue="0.53333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="---" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H2H-62-yqR">
+                                <rect key="frame" x="191" y="106" width="216" height="48"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="216" id="Apx-l3-DZH"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <color key="textColor" red="0.80000000000000004" green="0.80000000000000004" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" keyboardDismissMode="interactive" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4sC-Pd-ziQ">
+                                <rect key="frame" x="16" y="456" width="568" height="124"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="124" id="UPj-Tg-hOu"/>
+                                </constraints>
+                                <string key="text">foo bar quux test foo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux testfoo bar quux test</string>
+                                <color key="textColor" red="0.80000000000000004" green="0.80000000000000004" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <fontDescription key="fontDescription" name="Menlo-Regular" family="Menlo" pointSize="10"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="centerY" secondItem="BRQ-06-O5h" secondAttribute="centerY" constant="36" id="1Mz-Z8-P3f"/>
-                            <constraint firstAttribute="bottom" secondItem="4sC-Pd-ziQ" secondAttribute="bottom" constant="8" id="MLc-65-ktH"/>
-                            <constraint firstItem="cSS-CE-NjP" firstAttribute="top" secondItem="BRQ-06-O5h" secondAttribute="bottom" constant="51" id="TlP-8K-6xM"/>
-                            <constraint firstItem="4sC-Pd-ziQ" firstAttribute="top" secondItem="cSS-CE-NjP" secondAttribute="bottom" constant="55" id="acf-1n-jEh"/>
+                            <constraint firstAttribute="centerX" secondItem="4sC-Pd-ziQ" secondAttribute="centerX" id="8Ag-K9-Pgu"/>
+                            <constraint firstItem="H2H-62-yqR" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="42" id="9dz-lR-9lo"/>
+                            <constraint firstItem="4sC-Pd-ziQ" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="GDe-lD-Jbc"/>
+                            <constraint firstItem="cSS-CE-NjP" firstAttribute="top" secondItem="BRQ-06-O5h" secondAttribute="bottom" constant="36" id="HWa-8W-vTU"/>
+                            <constraint firstAttribute="bottom" secondItem="4sC-Pd-ziQ" secondAttribute="bottom" constant="20" symbolic="YES" id="KC5-Sa-mYP"/>
+                            <constraint firstItem="4sC-Pd-ziQ" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="We9-BT-qxg"/>
+                            <constraint firstAttribute="centerX" secondItem="H2H-62-yqR" secondAttribute="centerX" constant="1" id="XMW-QX-noP"/>
+                            <constraint firstItem="4sC-Pd-ziQ" firstAttribute="top" secondItem="cSS-CE-NjP" secondAttribute="bottom" constant="34" id="ZtQ-6A-6l6"/>
+                            <constraint firstItem="H2H-62-yqR" firstAttribute="leading" secondItem="cSS-CE-NjP" secondAttribute="leading" id="bMI-pa-k5u"/>
+                            <constraint firstItem="H2H-62-yqR" firstAttribute="trailing" secondItem="cSS-CE-NjP" secondAttribute="trailing" id="bYg-sR-D6h"/>
                             <constraint firstAttribute="centerX" secondItem="BRQ-06-O5h" secondAttribute="centerX" constant="-1" id="bgg-pQ-LTS"/>
-                            <constraint firstItem="4sC-Pd-ziQ" firstAttribute="centerX" secondItem="BRQ-06-O5h" secondAttribute="centerX" constant="-2" id="cg4-sz-rdd"/>
-                            <constraint firstAttribute="centerX" secondItem="cSS-CE-NjP" secondAttribute="centerX" constant="1" id="qOV-YB-hRU"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="4sC-Pd-ziQ" secondAttribute="trailing" id="vNZ-Ic-75U"/>
+                            <constraint firstItem="BRQ-06-O5h" firstAttribute="top" secondItem="H2H-62-yqR" secondAttribute="bottom" constant="36" id="vB0-IN-7mL"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Garage Opener" id="Z3G-PP-ESc">
@@ -77,6 +88,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="openButton" destination="BRQ-06-O5h" id="7xZ-ps-5wF"/>
+                        <outlet property="rssiLabel" destination="H2H-62-yqR" id="P0u-RC-cwF"/>
                         <outlet property="statusLabel" destination="cSS-CE-NjP" id="upw-05-0he"/>
                         <outlet property="textLog" destination="4sC-Pd-ziQ" id="lh0-7C-C9I"/>
                     </connections>
