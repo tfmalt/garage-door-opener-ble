@@ -42,6 +42,7 @@
 		920E5ECE1A615EAC00B0E5E3 /* GarageOpenerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GarageOpenerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		920E5ED31A615EAC00B0E5E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		920E5ED41A615EAC00B0E5E3 /* GarageOpenerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageOpenerTests.swift; sourceTree = "<group>"; };
+		92443DF51A642DB200DF7AC6 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		926AE0E61A61D28600A19238 /* BTDiscoveryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTDiscoveryManager.swift; sourceTree = "<group>"; };
 		926AE0E91A62FDDC00A19238 /* BTService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BTService.swift; path = ../BTService.swift; sourceTree = "<group>"; };
 		926AE0EC1A630A8000A19238 /* BTConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTConstants.swift; sourceTree = "<group>"; };
@@ -68,6 +69,7 @@
 		920E5EB01A615EAC00B0E5E3 = {
 			isa = PBXGroup;
 			children = (
+				92443DF51A642DB200DF7AC6 /* README.md */,
 				920E5EBB1A615EAC00B0E5E3 /* GarageOpener */,
 				920E5ED11A615EAC00B0E5E3 /* GarageOpenerTests */,
 				920E5EBA1A615EAC00B0E5E3 /* Products */,
@@ -127,9 +129,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		920E5EB81A615EAC00B0E5E3 /* GarageOpener */ = {
+		920E5EB81A615EAC00B0E5E3 /* Garage Opener */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 920E5ED81A615EAC00B0E5E3 /* Build configuration list for PBXNativeTarget "GarageOpener" */;
+			buildConfigurationList = 920E5ED81A615EAC00B0E5E3 /* Build configuration list for PBXNativeTarget "Garage Opener" */;
 			buildPhases = (
 				920E5EB51A615EAC00B0E5E3 /* Sources */,
 				920E5EB61A615EAC00B0E5E3 /* Frameworks */,
@@ -139,7 +141,7 @@
 			);
 			dependencies = (
 			);
-			name = GarageOpener;
+			name = "Garage Opener";
 			productName = GarageOpener;
 			productReference = 920E5EB91A615EAC00B0E5E3 /* GarageOpener.app */;
 			productType = "com.apple.product-type.application";
@@ -193,7 +195,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				920E5EB81A615EAC00B0E5E3 /* GarageOpener */,
+				920E5EB81A615EAC00B0E5E3 /* Garage Opener */,
 				920E5ECD1A615EAC00B0E5E3 /* GarageOpenerTests */,
 			);
 		};
@@ -248,7 +250,7 @@
 /* Begin PBXTargetDependency section */
 		920E5ED01A615EAC00B0E5E3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 920E5EB81A615EAC00B0E5E3 /* GarageOpener */;
+			target = 920E5EB81A615EAC00B0E5E3 /* Garage Opener */;
 			targetProxy = 920E5ECF1A615EAC00B0E5E3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -418,7 +420,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		920E5ED81A615EAC00B0E5E3 /* Build configuration list for PBXNativeTarget "GarageOpener" */ = {
+		920E5ED81A615EAC00B0E5E3 /* Build configuration list for PBXNativeTarget "Garage Opener" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				920E5ED91A615EAC00B0E5E3 /* Debug */,
