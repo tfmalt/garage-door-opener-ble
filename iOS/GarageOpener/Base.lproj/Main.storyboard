@@ -17,9 +17,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BRQ-06-O5h">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BRQ-06-O5h">
                                 <rect key="frame" x="227" y="190" width="148" height="148"/>
-                                <color key="backgroundColor" red="0.0" green="0.59999999999999998" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.40000000000000002" green="0.80000000000000004" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="148" id="jXo-Xm-g0g"/>
                                     <constraint firstAttribute="width" constant="148" id="uVk-IK-kDI"/>
@@ -80,7 +80,8 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Garage Opener" id="Z3G-PP-ESc">
-                        <barButtonItem key="leftBarButtonItem" title="Item" id="f1k-Av-CtW">
+                        <barButtonItem key="rightBarButtonItem" image="GearIcon" id="f1k-Av-CtW">
+                            <color key="tintColor" red="0.53333333333333333" green="0.53333333333333333" blue="0.53333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <segue destination="0kQ-TB-nf4" kind="show" id="xe9-TQ-boO"/>
                             </connections>
@@ -204,4 +205,7 @@
             <point key="canvasLocation" x="522" y="1151"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="GearIcon" width="22" height="22"/>
+    </resources>
 </document>
