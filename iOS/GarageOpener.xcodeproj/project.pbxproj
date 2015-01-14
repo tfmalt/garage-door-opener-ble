@@ -9,54 +9,35 @@
 /* Begin PBXBuildFile section */
 		920E5EBF1A615EAC00B0E5E3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920E5EBE1A615EAC00B0E5E3 /* AppDelegate.swift */; };
 		920E5EC11A615EAC00B0E5E3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920E5EC01A615EAC00B0E5E3 /* ViewController.swift */; };
-		920E5EC41A615EAC00B0E5E3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC21A615EAC00B0E5E3 /* Main.storyboard */; };
 		920E5EC61A615EAC00B0E5E3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC51A615EAC00B0E5E3 /* Images.xcassets */; };
 		920E5EC91A615EAC00B0E5E3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC71A615EAC00B0E5E3 /* LaunchScreen.xib */; };
-		920E5ED51A615EAC00B0E5E3 /* GarageOpenerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920E5ED41A615EAC00B0E5E3 /* GarageOpenerTests.swift */; };
+		922973C21A65891300C7E9A9 /* BTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922973C11A65891300C7E9A9 /* BTService.swift */; };
+		922973C31A658B9F00C7E9A9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC21A615EAC00B0E5E3 /* Main.storyboard */; };
 		926AE0E71A61D28600A19238 /* BTDiscoveryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0E61A61D28600A19238 /* BTDiscoveryManager.swift */; };
-		926AE0E81A61D28600A19238 /* BTDiscoveryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0E61A61D28600A19238 /* BTDiscoveryManager.swift */; };
-		926AE0EA1A62FDDC00A19238 /* BTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0E91A62FDDC00A19238 /* BTService.swift */; };
-		926AE0EB1A62FDDC00A19238 /* BTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0E91A62FDDC00A19238 /* BTService.swift */; };
 		926AE0ED1A630A8000A19238 /* BTConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0EC1A630A8000A19238 /* BTConstants.swift */; };
-		926AE0EE1A630A8000A19238 /* BTConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0EC1A630A8000A19238 /* BTConstants.swift */; };
+		92784C1F1A659E9B00AB46E9 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92784C1E1A659E9B00AB46E9 /* UIColorExtension.swift */; };
+		92784C211A659F3500AB46E9 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92784C201A659F3500AB46E9 /* UIImageExtension.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		920E5ECF1A615EAC00B0E5E3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 920E5EB11A615EAC00B0E5E3 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 920E5EB81A615EAC00B0E5E3;
-			remoteInfo = GarageOpener;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
-		920E5EB91A615EAC00B0E5E3 /* GarageOpener.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GarageOpener.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		920E5EB91A615EAC00B0E5E3 /* Garage Opener.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Garage Opener.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		920E5EBD1A615EAC00B0E5E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		920E5EBE1A615EAC00B0E5E3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		920E5EC01A615EAC00B0E5E3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		920E5EC31A615EAC00B0E5E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		920E5EC51A615EAC00B0E5E3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		920E5EC81A615EAC00B0E5E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		920E5ECE1A615EAC00B0E5E3 /* GarageOpenerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GarageOpenerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		920E5ED31A615EAC00B0E5E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		920E5ED41A615EAC00B0E5E3 /* GarageOpenerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageOpenerTests.swift; sourceTree = "<group>"; };
-		92443DF51A642DB200DF7AC6 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		922973C11A65891300C7E9A9 /* BTService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTService.swift; sourceTree = "<group>"; };
 		926AE0E61A61D28600A19238 /* BTDiscoveryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTDiscoveryManager.swift; sourceTree = "<group>"; };
-		926AE0E91A62FDDC00A19238 /* BTService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BTService.swift; path = ../BTService.swift; sourceTree = "<group>"; };
 		926AE0EC1A630A8000A19238 /* BTConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTConstants.swift; sourceTree = "<group>"; };
+		92784C1E1A659E9B00AB46E9 /* UIColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
+		92784C201A659F3500AB46E9 /* UIImageExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		920E5EB61A615EAC00B0E5E3 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		920E5ECB1A615EAC00B0E5E3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -69,7 +50,6 @@
 		920E5EB01A615EAC00B0E5E3 = {
 			isa = PBXGroup;
 			children = (
-				92443DF51A642DB200DF7AC6 /* README.md */,
 				920E5EBB1A615EAC00B0E5E3 /* GarageOpener */,
 				920E5ED11A615EAC00B0E5E3 /* GarageOpenerTests */,
 				920E5EBA1A615EAC00B0E5E3 /* Products */,
@@ -79,8 +59,7 @@
 		920E5EBA1A615EAC00B0E5E3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				920E5EB91A615EAC00B0E5E3 /* GarageOpener.app */,
-				920E5ECE1A615EAC00B0E5E3 /* GarageOpenerTests.xctest */,
+				920E5EB91A615EAC00B0E5E3 /* Garage Opener.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,8 +74,10 @@
 				920E5EC71A615EAC00B0E5E3 /* LaunchScreen.xib */,
 				920E5EBC1A615EAC00B0E5E3 /* Supporting Files */,
 				926AE0E61A61D28600A19238 /* BTDiscoveryManager.swift */,
-				926AE0E91A62FDDC00A19238 /* BTService.swift */,
+				922973C11A65891300C7E9A9 /* BTService.swift */,
 				926AE0EC1A630A8000A19238 /* BTConstants.swift */,
+				92784C1E1A659E9B00AB46E9 /* UIColorExtension.swift */,
+				92784C201A659F3500AB46E9 /* UIImageExtension.swift */,
 			);
 			path = GarageOpener;
 			sourceTree = "<group>";
@@ -143,26 +124,8 @@
 			);
 			name = "Garage Opener";
 			productName = GarageOpener;
-			productReference = 920E5EB91A615EAC00B0E5E3 /* GarageOpener.app */;
+			productReference = 920E5EB91A615EAC00B0E5E3 /* Garage Opener.app */;
 			productType = "com.apple.product-type.application";
-		};
-		920E5ECD1A615EAC00B0E5E3 /* GarageOpenerTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 920E5EDB1A615EAC00B0E5E3 /* Build configuration list for PBXNativeTarget "GarageOpenerTests" */;
-			buildPhases = (
-				920E5ECA1A615EAC00B0E5E3 /* Sources */,
-				920E5ECB1A615EAC00B0E5E3 /* Frameworks */,
-				920E5ECC1A615EAC00B0E5E3 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				920E5ED01A615EAC00B0E5E3 /* PBXTargetDependency */,
-			);
-			name = GarageOpenerTests;
-			productName = GarageOpenerTests;
-			productReference = 920E5ECE1A615EAC00B0E5E3 /* GarageOpenerTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -175,10 +138,6 @@
 				TargetAttributes = {
 					920E5EB81A615EAC00B0E5E3 = {
 						CreatedOnToolsVersion = 6.1.1;
-					};
-					920E5ECD1A615EAC00B0E5E3 = {
-						CreatedOnToolsVersion = 6.1.1;
-						TestTargetID = 920E5EB81A615EAC00B0E5E3;
 					};
 				};
 			};
@@ -196,7 +155,6 @@
 			projectRoot = "";
 			targets = (
 				920E5EB81A615EAC00B0E5E3 /* Garage Opener */,
-				920E5ECD1A615EAC00B0E5E3 /* GarageOpenerTests */,
 			);
 		};
 /* End PBXProject section */
@@ -206,16 +164,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				920E5EC41A615EAC00B0E5E3 /* Main.storyboard in Resources */,
+				922973C31A658B9F00C7E9A9 /* Main.storyboard in Resources */,
 				920E5EC91A615EAC00B0E5E3 /* LaunchScreen.xib in Resources */,
 				920E5EC61A615EAC00B0E5E3 /* Images.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		920E5ECC1A615EAC00B0E5E3 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,33 +178,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				920E5EC11A615EAC00B0E5E3 /* ViewController.swift in Sources */,
-				926AE0EA1A62FDDC00A19238 /* BTService.swift in Sources */,
 				926AE0E71A61D28600A19238 /* BTDiscoveryManager.swift in Sources */,
+				92784C211A659F3500AB46E9 /* UIImageExtension.swift in Sources */,
+				922973C21A65891300C7E9A9 /* BTService.swift in Sources */,
 				926AE0ED1A630A8000A19238 /* BTConstants.swift in Sources */,
 				920E5EBF1A615EAC00B0E5E3 /* AppDelegate.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		920E5ECA1A615EAC00B0E5E3 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				926AE0EB1A62FDDC00A19238 /* BTService.swift in Sources */,
-				926AE0E81A61D28600A19238 /* BTDiscoveryManager.swift in Sources */,
-				920E5ED51A615EAC00B0E5E3 /* GarageOpenerTests.swift in Sources */,
-				926AE0EE1A630A8000A19238 /* BTConstants.swift in Sources */,
+				92784C1F1A659E9B00AB46E9 /* UIColorExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		920E5ED01A615EAC00B0E5E3 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 920E5EB81A615EAC00B0E5E3 /* Garage Opener */;
-			targetProxy = 920E5ECF1A615EAC00B0E5E3 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		920E5EC21A615EAC00B0E5E3 /* Main.storyboard */ = {
@@ -361,6 +295,7 @@
 				INFOPLIST_FILE = GarageOpener/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -371,40 +306,7 @@
 				INFOPLIST_FILE = GarageOpener/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		920E5EDC1A615EAC00B0E5E3 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = GarageOpenerTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GarageOpener.app/GarageOpener";
-			};
-			name = Debug;
-		};
-		920E5EDD1A615EAC00B0E5E3 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = GarageOpenerTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GarageOpener.app/GarageOpener";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -425,15 +327,6 @@
 			buildConfigurations = (
 				920E5ED91A615EAC00B0E5E3 /* Debug */,
 				920E5EDA1A615EAC00B0E5E3 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		920E5EDB1A615EAC00B0E5E3 /* Build configuration list for PBXNativeTarget "GarageOpenerTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				920E5EDC1A615EAC00B0E5E3 /* Debug */,
-				920E5EDD1A615EAC00B0E5E3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
