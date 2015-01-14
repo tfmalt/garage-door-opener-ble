@@ -28,10 +28,9 @@ class ViewController: UIViewController {
         textLog.text = ""
         self.addLogMsg("Initializing...");
         statusLabel.text = "Initializing";
-        rssiLabel.text = self.getConnectionBar(0)
+        rssiLabel.text = "rssi: \(self.getConnectionBar(0)) [---]"
         
-        openButton.layer.cornerRadius = 0.5 * openButton.bounds.size.width
-        
+        self.makeButtonCircular()
         self.updateOpenButtonWait()
         
         nc.addObserver(self, selector: Selector("btStateChanged:"), name: "btStateChangedNotification", object: nil)
@@ -65,53 +64,61 @@ class ViewController: UIViewController {
         return result
     }
     
+
     @IBAction func openButtonPressed(sender: UIButton) {
         counter = counter + 1;
         
-        self.addLogMsg("button pressed: \(counter)")
-        println("Button got pressed:")
-        if self.discovery == nil {
-            println("  Could not find discovery object.")
-            return
-        }
+        let rx = self.getRXCharacteristic()
+        if rx == nil { return }
+       
+        let peripheral = self.getActivePeripheral()
+        if peripheral == nil { return }
         
-        let peripheral = self.discovery?.activePeripheral
-        
-        if peripheral == nil {
-            println("  Did not get active peripheral.")
-            return
-        }
-        
-        if peripheral?.state != CBPeripheralState.Connected {
-            println("  Peripheral apparently is not connected.")
-            return
-        }
-        
-        let service = self.discovery?.activeService
-        
-        if service == nil {
-            println("  Did not get active service.")
-            return
-        }
-        
-        let tx = service?.txCharacteristic
-        if (tx == nil) {
-            println("  Did not get tx characteristic.")
-            return
-        }
-        
-        let rx = service?.rxCharacteristic
-        if (rx == nil) {
-            println("  Did not get rx characteristic")
-            return
-        }
-        
+        self.addLogMsg("button pressed: \(counter). Sending data")
         
         var str = "0Martha";
         var data : NSData = str.dataUsingEncoding(NSUTF8StringEncoding)!
         
         peripheral?.writeValue(data, forCharacteristic: rx, type: CBCharacteristicWriteType.WithoutResponse)
+    }
+    
+    func getActivePeripheral() -> CBPeripheral? {
+        if self.discovery == nil {
+            println("  Could not find discovery object.")
+            return nil
+        }
         
+        let peripheral = self.discovery!.activePeripheral
+        if peripheral == nil {
+            println("  Did not get active peripheral.")
+            return nil
+        }
+        
+        if peripheral?.state != CBPeripheralState.Connected {
+            println("  Peripheral apparently is not connected.")
+            return nil
+        }
+
+        return peripheral
+    }
+    
+    func getRXCharacteristic() -> CBCharacteristic? {
+        let peripheral = self.getActivePeripheral()
+        if peripheral == nil { return nil }
+        
+        let service = self.discovery?.activeService
+        if service == nil {
+            println("  Did not get active service.")
+            return nil
+        }
+        
+        let rx = service?.rxCharacteristic
+        if (rx == nil) {
+            println("  Did not get rx characteristic")
+            return nil
+        }
+        
+        return rx
     }
     
     /// A really naive first attempt at adding a log abstraction for the 
@@ -129,17 +136,42 @@ class ViewController: UIViewController {
     func updateOpenButtonWait() {
         let color = UIColor(red: 0.9, green: 0.0, blue: 0.0, alpha: 1.0)
         
-        openButton.backgroundColor = color;
+        openButton.setBackgroundImage(
+            UIImage.imageWithColor(color), forState: UIControlState.Normal
+        )
+        
+        openButton.setBackgroundImage(
+            UIImage.imageWithColor(color), forState: UIControlState.Highlighted
+        )
+
         openButton.setTitle("Wait", forState: UIControlState.Normal)
     }
     
-    func updateOpenButtonScanning() {
-        let color = UIColor.orangeColor()
+    func updateOpenButtonNormal() {
+        openButton.setBackgroundImage(
+            UIImage.imageWithColor(UIColor.colorWithHex("#0099CC")),
+            forState: UIControlState.Normal
+        )
         
-        openButton.backgroundColor = color;
-        openButton.setTitle("Wait", forState: UIControlState.Normal)
+        openButton.setBackgroundImage(
+            UIImage.imageWithColor(UIColor.colorWithHex("#338822")),
+            forState: UIControlState.Highlighted
+        )
+        
+        self.openButton.setTitle("Open", forState: UIControlState.Normal)
+        
     }
-
+    
+    func makeButtonCircular() {
+        openButton.frame = CGRectMake(
+            0, 0,
+            openButton.bounds.size.width,
+            openButton.bounds.size.height
+        )
+        
+        openButton.clipsToBounds = true;
+        openButton.layer.cornerRadius = 0.5 * openButton.bounds.size.width
+    }
     
     
     /// Listens to notifications about CoreBluetooth state changes
@@ -169,11 +201,11 @@ class ViewController: UIViewController {
             
             if (msg == "Bluetooth Off") {
                 self.updateOpenButtonWait()
-                self.rssiLabel.text = self.getConnectionBar(0)
+                self.rssiLabel.text = "rssi: \(self.getConnectionBar(0)) [---]"
             }
             else if (msg == "Scanning") {
-                self.updateOpenButtonScanning()
-                self.rssiLabel.text = self.getConnectionBar(0)
+                self.updateOpenButtonWait()
+                self.rssiLabel.text = "rssi: \(self.getConnectionBar(0)) [---]"
             }
         })
     }
@@ -190,13 +222,8 @@ class ViewController: UIViewController {
             self.isConnected = isConnected
             
             dispatch_async(dispatch_get_main_queue(), {
-            
-                self.openButton.backgroundColor = UIColor(
-                    red: 0.0, green: 0.6, blue: 0.8, alpha: 1.0
-                )
-                self.openButton.setTitle("Open", forState: UIControlState.Normal)
+                self.updateOpenButtonNormal()
                 self.statusLabel.text = "Connected"
-            
                 self.addLogMsg("Device connected")
             })
         
@@ -219,9 +246,16 @@ class ViewController: UIViewController {
         })
     }
     
-    func btUpdateRSSI(notification: NSNotification) {
-        // println("got update rssi notification")
+    func getQualityFromRSSI(RSSI: NSNumber!) -> Int {
+        var quality = 2 * (RSSI.integerValue + 100);
         
+        if quality < 0 { quality = 0 }
+        if quality > 100 { quality = 100 }
+        
+        return quality
+    }
+    
+    func btUpdateRSSI(notification: NSNotification) {
         let info = notification.userInfo as [String: NSNumber]
         let peripheral = notification.object as CBPeripheral
         var rssi : NSNumber! = info["rssi"]
@@ -231,34 +265,15 @@ class ViewController: UIViewController {
             return
         }
         
-        var b = "\u{25A0}"
-        var s = "\u{25A1}"
+        var quality  : Int = self.getQualityFromRSSI(rssi)
+        var strength : Int = Int(ceil(Double(quality) / 20))
         
-        var block = ""
-        if (rssi.integerValue > -50) {
-            block = b + b + b + b + b
-        }
-        else if (rssi.integerValue > -60) {
-            block = b + b + b + b + s
-        }
-        else if (rssi.integerValue > -70) {
-            block = b + b + b + s + s
-        }
-        else if rssi.integerValue > -80 {
-            block = b + b + s + s + s
-        }
-        else if rssi.integerValue > -90 {
-            block = b + s + s + s + s
-        }
-        else if rssi.integerValue > -100 {
-            block = s + s + s + s + s
-        }
-
+        var block = self.getConnectionBar(strength)
         
+        // println("Got RSSI: \(rssi) \(quality) \(strength)")
         
         dispatch_async(dispatch_get_main_queue(), {
-            self.rssiLabel.text = block
-            self.addLogMsg("Got RSSI from Device: \(rssi.integerValue)")
+            self.rssiLabel.text = "rssi: \(block) [\(rssi)]"
         })
     }
 }
