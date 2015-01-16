@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreBluetooth
+import UIKit
 
 class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     
@@ -33,6 +34,10 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     override init() {
         super.init()
         
+        nc.addObserver(self, selector: Selector("appWillResignActive"), name: UIApplicationWillResignActiveNotification, object: nil)
+        
+        nc.addObserver(self, selector: Selector("appDidBecomeActive"), name: UIApplicationDidBecomeActiveNotification, object: nil)
+        
         let queue = dispatch_queue_create("no.malt", DISPATCH_QUEUE_SERIAL)
         centralManager = CBCentralManager(delegate: self, queue: queue)
         
@@ -44,6 +49,38 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
         return "Hello from BTDiscovery.";
     }
     
+    
+    func appWillResignActive() {
+        println("Discovery Manager: will resign active")
+        
+        if (self.activePeripheral == nil) {
+            println("  Got nil activePeripheral. Not connected.")
+            return
+        }
+        
+        if let state = self.activePeripheral?.state {
+            if (state == CBPeripheralState.Connected) {
+                let p = self.activePeripheral
+                self.resetConnection()
+                self.centralManager?.cancelPeripheralConnection(p)
+            }
+        }
+        else {
+            println("  Did not get state or state is not connected.")
+        }
+    }
+    
+    
+    func appDidBecomeActive() {
+        println("Discovery Manager: did become active")
+        
+        if self.centralManager?.state == CBCentralManagerState.PoweredOn {
+            self.startScanning()
+        }
+        else {
+            println("  App became active but Bluetooth not on.")
+        }
+    }
     
     
     func delay(delay:Double, closure:()->()) {
@@ -108,18 +145,25 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
         central.stopScan()
     }
     
+    
     func centralManager(central: CBCentralManager!, didDisconnectPeripheral peripheral: CBPeripheral!, error: NSError!) {
         println("Called did Disconnect Peripheral: \(peripheral)")
         
         nc.postNotificationName("btStateChangedNotification", object: "Disconnected", userInfo: ["peripheral": peripheral])
         
+        // when activePeripheral is set to nil we know we don't need to reconnect.
         if (peripheral == self.activePeripheral) {
             self.resetConnection()
             self.startScanning()
         }
     }
     
-    func centralManager(central: CBCentralManager!, didDiscoverPeripheral peripheral: CBPeripheral!, advertisementData: [NSObject : AnyObject]!, RSSI: NSNumber!) {
+    
+    func centralManager(
+        central: CBCentralManager!,
+        didDiscoverPeripheral peripheral: CBPeripheral!,
+        advertisementData: [NSObject : AnyObject]!,
+        RSSI: NSNumber!) {
         
         let uuid = peripheral.identifier.UUIDString;
         
@@ -130,7 +174,7 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
             return
         }
         
-        if (RSSI.integerValue == 127 || RSSI.integerValue < -85) {
+        if (RSSI.integerValue == 127 || RSSI.integerValue < -95) {
             self.handleLowSignal(RSSI.integerValue)
             return
         }
@@ -142,22 +186,24 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
             userInfo: ["peripheral": peripheral, "RSSI": RSSI])
         
         central.connectPeripheral(peripheral, options: nil)
-        
-        
     }
+    
     
     func handleLowSignal(signal: Int) {
         println("  Do not connect rssi: \(signal)")
+        
         var msg = "Low Signal: \(signal)"
         nc.postNotificationName("btStateChangedNotification", object: msg)
         
         self.centralManager?.stopScan()
         self.resetConnection()
+        
         delay(1.0) {
             // Wait one second to start scanning again.
             self.startScanning()
         }
     }
+    
     
     func centralManager(central: CBCentralManager!, didFailToConnectPeripheral peripheral: CBPeripheral!, error: NSError!) {
         println("Called didFailToConnectPeripheral")
@@ -178,7 +224,6 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
         case CBCentralManagerState.PoweredOn:
             println("BLE state Powered On")
             state = nil
-            self.startScanning()
             break
         case CBCentralManagerState.Unknown:
             println("BLE state unknown")
