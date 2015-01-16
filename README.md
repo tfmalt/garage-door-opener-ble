@@ -4,12 +4,9 @@ Garage Opener
 
 An iOS Swift to arduino bluetooth LE experiment.
 
-This is a toy experiment to interface my garage door opener with swift and an arduino uno.
+This is a toy experiment to learn swift and create a control for my garage door opener using an arduino uno in the same go.
 
 ## TODO
-* password setting dialog on iOS 
-* implement wake from sleep event
-* investigate light sensor reading
 
 ## DONE
 * set new password on ardinuo over serial.
@@ -17,3 +14,6 @@ This is a toy experiment to interface my garage door opener with swift and an ar
 * Send updates to textviews on device discovery
 * Make connecting to devices based on service UUID, not device
 * Send an actual update.
+* password setting dialog on iOS 
+* implement wake from sleep event
+* investigate light sensor reading
