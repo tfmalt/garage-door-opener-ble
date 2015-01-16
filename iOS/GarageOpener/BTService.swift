@@ -55,8 +55,6 @@ class BTService : NSObject, CBPeripheralDelegate {
     // Adds the two characteristics to the object for easy retrival
     func peripheral(peripheral: CBPeripheral!, didDiscoverCharacteristicsForService service: CBService!, error: NSError!) {
         println("got did discover characteristics for service")
-        println("characteristics: \(service.characteristics)")
-        
         for cha in service.characteristics {
             if cha.UUID == CBUUID(string: btConst.CHAR_TX_UUID) {
                 self.txCharacteristic = (cha as CBCharacteristic)
@@ -91,29 +89,22 @@ class BTService : NSObject, CBPeripheralDelegate {
             CBUUID(string: btConst.CHAR_TX_UUID)
         ]
         
-        println("got did discover services: \(peripheral.services)")
-        println("  count: \(peripheral.services.count)")
-        
         if (error != nil) {
             println("got error: a surprise: \(error)")
             return
         }
         
+        // Sometimes services has been reported as nil. testing for that.
         if ((peripheral.services == nil) || (peripheral.services.count == 0)) {
             println("Got no services!")
             return
         }
 
         for service in peripheral.services {
-            println("  service: \(service.UUID)")
-            println("  btConst: \(btConst.SERVICE_UUID)")
-            
             if (service.UUID == CBUUID(string: btConst.SERVICE_UUID)) {
-                println("   Matching service uuid. discover characteristics")
                 peripheral.discoverCharacteristics(cUUIDs, forService: service as CBService)
             }
         }
-
     }
     
     func peripheral(peripheral: CBPeripheral!, didModifyServices invalidatedServices: [AnyObject]!) {
