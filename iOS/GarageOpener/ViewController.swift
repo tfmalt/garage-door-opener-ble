@@ -19,6 +19,7 @@ class ViewController: UIViewController {
     var discovery : BTDiscoveryManager?
     var isConnected : Bool?
     var nc = NSNotificationCenter.defaultCenter()
+    var config = NSUserDefaults.standardUserDefaults()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +34,10 @@ class ViewController: UIViewController {
         self.makeButtonCircular()
         self.updateOpenButtonWait()
         
+        nc.addObserver(self, selector: Selector("appWillResignActive:"), name: UIApplicationWillResignActiveNotification, object: nil)
+        
+        nc.addObserver(self, selector: Selector("appWillTerminate:"), name: UIApplicationWillTerminateNotification, object: nil)
+            
         nc.addObserver(self, selector: Selector("btStateChanged:"), name: "btStateChangedNotification", object: nil)
         
         nc.addObserver(self, selector: Selector("btConnectionChanged:"), name: "btConnectionChangedNotification", object: nil)
@@ -44,6 +49,15 @@ class ViewController: UIViewController {
         discovery = BTDiscoveryManager()
     }
 
+    func appWillResignActive(notification: NSNotification) {
+        println("App will resign active")
+        textLog.text = ""
+    }
+    
+    func appWillTerminate(notification: NSNotification) {
+        println("App will terminate")
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -74,13 +88,16 @@ class ViewController: UIViewController {
         let peripheral = self.getActivePeripheral()
         if peripheral == nil { return }
         
-        self.addLogMsg("button pressed: \(counter). Sending data")
+        if let pass = config.valueForKey("password") as? String {
+            var str = "0" + pass;
+            var data : NSData = str.dataUsingEncoding(NSUTF8StringEncoding)!
         
-        var str = "0Martha";
-        var data : NSData = str.dataUsingEncoding(NSUTF8StringEncoding)!
-        
-        peripheral?.writeValue(data, forCharacteristic: rx, type: CBCharacteristicWriteType.WithoutResponse)
+            peripheral?.writeValue(data, forCharacteristic: rx, type: CBCharacteristicWriteType.WithoutResponse)
+        } else {
+            println("Did not find valid password, so not writing anything")
+        }
     }
+    
     
     func getActivePeripheral() -> CBPeripheral? {
         if self.discovery == nil {
@@ -192,20 +209,24 @@ class ViewController: UIViewController {
         
         println("got notification: \(msg)")
         dispatch_async(dispatch_get_main_queue(), {
-            self.addLogMsg(log)
-            
             if (msg.hasPrefix("Low Signal")) {
                 return
             }
+            
             self.statusLabel.text = msg
             
-            if (msg == "Bluetooth Off") {
+            if (msg == "Disconnected") {
+                self.updateOpenButtonWait()
+                self.addLogMsg("Garage Opener Disconnected")
+            }
+            else if (msg == "Bluetooth Off") {
                 self.updateOpenButtonWait()
                 self.rssiLabel.text = "rssi: \(self.getConnectionBar(0)) [---]"
             }
             else if (msg == "Scanning") {
                 self.updateOpenButtonWait()
                 self.rssiLabel.text = "rssi: \(self.getConnectionBar(0)) [---]"
+                self.addLogMsg("Scanning...")
             }
         })
     }
@@ -224,7 +245,7 @@ class ViewController: UIViewController {
             dispatch_async(dispatch_get_main_queue(), {
                 self.updateOpenButtonNormal()
                 self.statusLabel.text = "Connected"
-                self.addLogMsg("Device connected")
+                self.addLogMsg("Garage Opener Connected")
             })
         
         }
