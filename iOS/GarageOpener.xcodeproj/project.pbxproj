@@ -11,6 +11,7 @@
 		920E5EC11A615EAC00B0E5E3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920E5EC01A615EAC00B0E5E3 /* ViewController.swift */; };
 		920E5EC61A615EAC00B0E5E3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC51A615EAC00B0E5E3 /* Images.xcassets */; };
 		920E5EC91A615EAC00B0E5E3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC71A615EAC00B0E5E3 /* LaunchScreen.xib */; };
+		9224EB241A688CBC00981CBE /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9224EB231A688CBC00981CBE /* SettingsController.swift */; };
 		922973C21A65891300C7E9A9 /* BTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922973C11A65891300C7E9A9 /* BTService.swift */; };
 		922973C31A658B9F00C7E9A9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC21A615EAC00B0E5E3 /* Main.storyboard */; };
 		926AE0E71A61D28600A19238 /* BTDiscoveryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0E61A61D28600A19238 /* BTDiscoveryManager.swift */; };
@@ -29,6 +30,7 @@
 		920E5EC81A615EAC00B0E5E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		920E5ED31A615EAC00B0E5E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		920E5ED41A615EAC00B0E5E3 /* GarageOpenerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageOpenerTests.swift; sourceTree = "<group>"; };
+		9224EB231A688CBC00981CBE /* SettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		922973C11A65891300C7E9A9 /* BTService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTService.swift; sourceTree = "<group>"; };
 		926AE0E61A61D28600A19238 /* BTDiscoveryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTDiscoveryManager.swift; sourceTree = "<group>"; };
 		926AE0EC1A630A8000A19238 /* BTConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTConstants.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 				920E5EBE1A615EAC00B0E5E3 /* AppDelegate.swift */,
 				920E5EC01A615EAC00B0E5E3 /* ViewController.swift */,
 				920E5EC21A615EAC00B0E5E3 /* Main.storyboard */,
+				9224EB231A688CBC00981CBE /* SettingsController.swift */,
 				920E5EC51A615EAC00B0E5E3 /* Images.xcassets */,
 				920E5EC71A615EAC00B0E5E3 /* LaunchScreen.xib */,
 				920E5EBC1A615EAC00B0E5E3 /* Supporting Files */,
@@ -177,6 +180,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9224EB241A688CBC00981CBE /* SettingsController.swift in Sources */,
 				920E5EC11A615EAC00B0E5E3 /* ViewController.swift in Sources */,
 				926AE0E71A61D28600A19238 /* BTDiscoveryManager.swift in Sources */,
 				92784C211A659F3500AB46E9 /* UIImageExtension.swift in Sources */,
@@ -282,6 +286,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
