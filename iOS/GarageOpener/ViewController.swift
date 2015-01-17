@@ -10,7 +10,6 @@ import UIKit
 import CoreBluetooth
 
 class ViewController: UIViewController {
-    @IBOutlet weak var textLog: UITextView!
     @IBOutlet weak var openButton: UIButton!
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var rssiLabel: UILabel!
@@ -26,36 +25,68 @@ class ViewController: UIViewController {
         
         isConnected = false
         
-        textLog.text = ""
-        self.addLogMsg("Initializing...");
         statusLabel.text = "Initializing";
-        rssiLabel.text = "rssi: \(self.getConnectionBar(0)) [---]"
+        rssiLabel.text = self.getConnectionBar(0)
         
         self.makeButtonCircular()
         self.updateOpenButtonWait()
-        
-        nc.addObserver(self, selector: Selector("appWillResignActive:"), name: UIApplicationWillResignActiveNotification, object: nil)
-        
-        nc.addObserver(self, selector: Selector("appWillTerminate:"), name: UIApplicationWillTerminateNotification, object: nil)
-            
-        nc.addObserver(self, selector: Selector("btStateChanged:"), name: "btStateChangedNotification", object: nil)
-        
-        nc.addObserver(self, selector: Selector("btConnectionChanged:"), name: "btConnectionChangedNotification", object: nil)
-        
-        nc.addObserver(self, selector: Selector("btFoundDevice:"), name: "btFoundDeviceNotification", object: nil)
-        
-        nc.addObserver(self, selector: Selector("btUpdateRSSI:"), name: "btRSSIUpdateNotification", object: nil)
+        self.registerObservers()
         
         discovery = BTDiscoveryManager()
     }
 
     func appWillResignActive(notification: NSNotification) {
         println("App will resign active")
-        textLog.text = ""
+        self.updateOpenButtonWait()
     }
     
     func appWillTerminate(notification: NSNotification) {
         println("App will terminate")
+    }
+    
+    func registerObservers() {
+        nc.addObserver(
+            self,
+            selector: Selector("appWillResignActive:"),
+            name: UIApplicationWillResignActiveNotification,
+            object: nil
+        )
+        
+        nc.addObserver(
+            self,
+            selector: Selector("appWillTerminate:"),
+            name: UIApplicationWillTerminateNotification,
+            object: nil
+        )
+        
+        nc.addObserver(
+            self,
+            selector: Selector("btStateChanged:"),
+            name: "btStateChangedNotification",
+            object: nil
+        )
+        
+        nc.addObserver(
+            self,
+            selector: Selector("btConnectionChanged:"),
+            name: "btConnectionChangedNotification",
+            object: nil
+        )
+        
+        nc.addObserver(
+            self,
+            selector: Selector("btFoundDevice:"),
+            name: "btFoundDeviceNotification",
+            object: nil
+        )
+        
+        nc.addObserver(
+            self,
+            selector: Selector("btUpdateRSSI:"),
+            name: "btRSSIUpdateNotification",
+            object: nil
+        )
+
     }
     
     override func didReceiveMemoryWarning() {
@@ -143,10 +174,7 @@ class ViewController: UIViewController {
     ///
     /// :param: msg The message to log
     func addLogMsg(msg: String) {
-        textLog.text = textLog.text + "\n" + msg
-        var length = countElements(textLog.text);
-        var range = NSMakeRange(length - 1, 1);
-        textLog.scrollRangeToVisible(range);
+        
     }
     
     
@@ -165,8 +193,10 @@ class ViewController: UIViewController {
     }
     
     func updateOpenButtonNormal() {
+        
+        // #0099CC - blue
         openButton.setBackgroundImage(
-            UIImage.imageWithColor(UIColor.colorWithHex("#0099CC")),
+            UIImage.imageWithColor(UIColor.colorWithHex("#66CC55")),
             forState: UIControlState.Normal
         )
         
@@ -179,15 +209,13 @@ class ViewController: UIViewController {
         
     }
     
+    
     func makeButtonCircular() {
-        openButton.frame = CGRectMake(
-            0, 0,
-            openButton.bounds.size.width,
-            openButton.bounds.size.height
-        )
-        
+        openButton.frame = CGRectMake(0, 0, 180, 180);
         openButton.clipsToBounds = true;
-        openButton.layer.cornerRadius = 0.5 * openButton.bounds.size.width
+        
+        println("Circular button: \(openButton.frame.size.width) x \(openButton.frame.size.height)")
+        openButton.layer.cornerRadius = 90
     }
     
     
@@ -217,16 +245,14 @@ class ViewController: UIViewController {
             
             if (msg == "Disconnected") {
                 self.updateOpenButtonWait()
-                self.addLogMsg("Garage Opener Disconnected")
             }
             else if (msg == "Bluetooth Off") {
                 self.updateOpenButtonWait()
-                self.rssiLabel.text = "rssi: \(self.getConnectionBar(0)) [---]"
+                self.rssiLabel.text = self.getConnectionBar(0)
             }
             else if (msg == "Scanning") {
                 self.updateOpenButtonWait()
-                self.rssiLabel.text = "rssi: \(self.getConnectionBar(0)) [---]"
-                self.addLogMsg("Scanning...")
+                self.rssiLabel.text = self.getConnectionBar(0)
             }
         })
     }
@@ -245,7 +271,6 @@ class ViewController: UIViewController {
             dispatch_async(dispatch_get_main_queue(), {
                 self.updateOpenButtonNormal()
                 self.statusLabel.text = "Connected"
-                self.addLogMsg("Garage Opener Connected")
             })
         
         }
@@ -262,8 +287,6 @@ class ViewController: UIViewController {
         dispatch_async(dispatch_get_main_queue(), {
             self.openButton.backgroundColor = UIColor.orangeColor()
             self.statusLabel.text = "Found Device..."
-            
-            self.addLogMsg("Found correct device (\(name)) (\(rssi))")
         })
     }
     
@@ -289,12 +312,8 @@ class ViewController: UIViewController {
         var quality  : Int = self.getQualityFromRSSI(rssi)
         var strength : Int = Int(ceil(Double(quality) / 20))
         
-        var block = self.getConnectionBar(strength)
-        
-        // println("Got RSSI: \(rssi) \(quality) \(strength)")
-        
         dispatch_async(dispatch_get_main_queue(), {
-            self.rssiLabel.text = "rssi: \(block) [\(rssi)]"
+            self.rssiLabel.text = self.getConnectionBar(strength)
         })
     }
 }
