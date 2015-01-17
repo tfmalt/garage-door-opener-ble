@@ -19,7 +19,7 @@
 
         <header>
           <h1>Garage Door Control</h1>
-          <h2>A hobbyist project to use an Arduino Uno with a Bluetooth 4.0 Low Energy shield and an iPhone companion app to build a remote garage door control</h2>
+          <h2>This si a pure hobby project to use an [Arduino Uno](http://arduino.cc/en/Main/arduinoBoardUno) with a Bluetooth 4.0 Low Energy shield and an iPhone companion app to build a remote garage door control</h2>
         </header>
 
         <section id="downloads" class="clearfix">
@@ -32,28 +32,23 @@
 
         <section id="main_content">
           <h1>
-<a id="garage-opener" class="anchor" href="#garage-opener" aria-hidden="true"><span class="octicon octicon-link"></span></a>Garage Opener</h1>
+<a id="about-the-project" class="anchor" href="#about-the-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>About the project</h1>
 
-<p>An iOS Swift to arduino bluetooth LE experiment.</p>
+<p>This started as my Christmas 2014 hacking project. I have a very flaky old <a href="http://www.stanleyblackanddecker.com/garage-doors">garage door from Stanley</a> and of late the remote control has been acting up. It being somewhat hard do come by spare parts for my exact model I decided to research building my own.</p>
 
-<p>This is a toy experiment to learn swift and create a control for my garage door opener using an arduino uno in the same go.</p>
+<p>Fortunately the control mechanism is dead simple. The manual control only requires a circuit to be closed and presto the door motor steps through three different modes in four steps when the circuit is closed:</p>
 
-<h2>
-<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span class="octicon octicon-link"></span></a>TODO</h2>
+<ol>
+<li>Open</li>
+<li>Stop</li>
+<li>Close</li>
+<li>Stop</li>
+</ol>
 
-<h2>
-<a id="done" class="anchor" href="#done" aria-hidden="true"><span class="octicon octicon-link"></span></a>DONE</h2>
+<p>The manual control consists of a push button attached to wire connectors on the garage door motor. 
+All required to connect another control mechanism would be to attach it by wire to the wire connectors and have it close the circuit for a small amount of time to send the desired commands to the motor.</p>
 
-<ul>
-<li>set new password on ardinuo over serial.</li>
-<li>get NSTimer to trigger reading iRRSI properly</li>
-<li>Send updates to textviews on device discovery</li>
-<li>Make connecting to devices based on service UUID, not device</li>
-<li>Send an actual update.</li>
-<li>password setting dialog on iOS </li>
-<li>implement wake from sleep event</li>
-<li>investigate light sensor reading</li>
-</ul>
+<p>Luckily this is dead simple to achieve with Arduino and a standard relay component to protect the Arduino from the voltage of the motor and act like the switch.</p>
         </section>
 
         <footer>
