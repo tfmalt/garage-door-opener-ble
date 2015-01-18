@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>72AAB8AF-4E9A-460F-8783-D4E479404C5A</string>
+	<key>IDESourceControlProjectName</key>
+	<string>GarageOpener</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>5AF64824D5E37FFAE8D9C5E07FB152E80341903C</key>
+		<string>github.com:tfmalt/garage-door-opener-ble.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>iOS/GarageOpener.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>5AF64824D5E37FFAE8D9C5E07FB152E80341903C</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:tfmalt/garage-door-opener-ble.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>5AF64824D5E37FFAE8D9C5E07FB152E80341903C</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>5AF64824D5E37FFAE8D9C5E07FB152E80341903C</string>
+			<key>IDESourceControlWCCName</key>
+			<string>garage-door-opener-ble</string>
+		</dict>
+	</array>
+</dict>
+</plist>
