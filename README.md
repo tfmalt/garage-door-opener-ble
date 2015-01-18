@@ -1,13 +1,17 @@
 
-Garage Opener
-=============
+# Garage Opener
 
-An iOS Swift to arduino bluetooth LE experiment.
+An iOS Swift to arduino Bluetooth LE experiment.
+See project homepage at http://tfmalt.github.io/garage-door-opener-ble/
 
-This is a toy experiment to learn swift and create a control for my garage door opener using an arduino uno in the same go.
+This is a hobby experiment to learn swift and create a control for my 
+garage door opener using an arduino uno in the same go.
+
+If you find it interesting or potentially useful, feel free to contribute or 
+ask for features or functionality.
 
 ## TODO
-
+*
 ## DONE
 * set new password on ardinuo over serial.
 * get NSTimer to trigger reading iRRSI properly
