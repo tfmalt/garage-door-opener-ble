@@ -11,6 +11,7 @@ If you find it interesting or potentially useful, feel free to contribute or
 ask for features or functionality.
 ## iOS App
 <img style="border: 1px solid #aaa" width="240px" src="http://tfmalt.github.io/garage-door-opener-ble/images/ios_scanning.jpg">
+<img style="border: 1px solid #aaa" width="240px" src="http://tfmalt.github.io/garage-door-opener-ble/images/ios_settings.jpg">
 
 ### TODO
 * Implement dark theme for night time
