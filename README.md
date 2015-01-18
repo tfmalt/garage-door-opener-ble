@@ -10,9 +10,13 @@ garage door opener using an arduino uno in the same go.
 If you find it interesting or potentially useful, feel free to contribute or 
 ask for features or functionality.
 
-## TODO
-*
-## DONE
+### TODO
+* Implement dark theme for night time
+* Settings interface to toggle preferred theme
+* Test camera light detection algorithm to toggle theme automatically.
+
+### DONE
+* Version 1.0 done.
 * set new password on ardinuo over serial.
 * get NSTimer to trigger reading iRRSI properly
 * Send updates to textviews on device discovery
