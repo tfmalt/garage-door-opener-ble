@@ -14,6 +14,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var rssiLabel: UILabel!
     
+    
     var counter = 0
     var discovery : BTDiscoveryManager?
     var isConnected : Bool?
