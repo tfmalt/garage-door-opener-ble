@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
-        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -19,13 +18,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Initalizing" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cSS-CE-NjP">
-                                <rect key="frame" x="16" y="338" width="288" height="27"/>
+                                <rect key="frame" x="16" y="370" width="288" height="27"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <color key="textColor" red="0.53333333333333333" green="0.53333333333333333" blue="0.53333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button autoresizesSubviews="NO" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BRQ-06-O5h">
-                                <rect key="frame" x="71" y="134" width="179" height="179"/>
+                            <button autoresizesSubviews="NO" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BRQ-06-O5h">
+                                <rect key="frame" x="70" y="140" width="180" height="180"/>
                                 <color key="backgroundColor" red="0.40000000000000002" green="0.80000000000000004" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="180" id="177-Fs-yyC"/>
@@ -49,7 +48,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OPy-Bo-vnd">
-                                <rect key="frame" x="272" y="513" width="32" height="32"/>
+                                <rect key="frame" x="272" y="516" width="32" height="32"/>
                                 <state key="normal" image="Gray Gear Icon">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -57,11 +56,10 @@
                                     <segue destination="wjP-6D-lxD" kind="modal" id="4BA-K7-rt2"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Signal" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H2H-62-yqR">
-                                <rect key="frame" x="16" y="762" width="153" height="18"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Signal" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e89-G1-Qbs">
+                                <rect key="frame" x="16" y="516" width="42" height="21"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="18" id="0V1-95-hHq"/>
-                                    <constraint firstAttribute="width" constant="153" id="cEg-lG-rCT"/>
+                                    <constraint firstAttribute="width" constant="42" id="JVc-9c-89b"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <color key="textColor" red="0.80000000000000004" green="0.80000000000000004" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -70,17 +68,18 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="e89-G1-Qbs" firstAttribute="top" secondItem="OPy-Bo-vnd" secondAttribute="top" id="0IN-J0-gE1"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="e89-G1-Qbs" secondAttribute="bottom" constant="31" id="5oI-2c-Avg"/>
+                            <constraint firstItem="kcN-ha-3wI" firstAttribute="leading" secondItem="e89-G1-Qbs" secondAttribute="leading" id="6wi-oU-F6B"/>
                             <constraint firstItem="OPy-Bo-vnd" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="Baz-ue-miP"/>
-                            <constraint firstItem="H2H-62-yqR" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="KP5-aE-MCy"/>
+                            <constraint firstItem="kcN-ha-3wI" firstAttribute="bottom" secondItem="OPy-Bo-vnd" secondAttribute="bottom" id="PeZ-6f-rY4"/>
                             <constraint firstAttribute="bottom" secondItem="kcN-ha-3wI" secondAttribute="bottom" constant="20" symbolic="YES" id="QBu-IQ-5dF"/>
                             <constraint firstItem="cSS-CE-NjP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="R6e-F1-O2S"/>
-                            <constraint firstItem="cSS-CE-NjP" firstAttribute="top" secondItem="BRQ-06-O5h" secondAttribute="bottom" constant="48" id="UB6-5P-s29"/>
-                            <constraint firstItem="BRQ-06-O5h" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="90" id="VMM-oa-b3x"/>
+                            <constraint firstItem="cSS-CE-NjP" firstAttribute="top" secondItem="BRQ-06-O5h" secondAttribute="bottom" constant="50" id="UB6-5P-s29"/>
+                            <constraint firstItem="BRQ-06-O5h" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="120" id="VMM-oa-b3x"/>
                             <constraint firstItem="BRQ-06-O5h" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="W1z-eF-zAT"/>
                             <constraint firstAttribute="trailingMargin" secondItem="cSS-CE-NjP" secondAttribute="trailing" id="aCc-DR-2gx"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="H2H-62-yqR" secondAttribute="bottom" constant="37" id="fof-JX-JlN"/>
-                            <constraint firstItem="H2H-62-yqR" firstAttribute="leading" secondItem="kcN-ha-3wI" secondAttribute="leading" id="hxd-BI-dym"/>
-                            <constraint firstItem="OPy-Bo-vnd" firstAttribute="top" secondItem="H2H-62-yqR" secondAttribute="top" id="ilV-7I-4kV"/>
+                            <constraint firstItem="kcN-ha-3wI" firstAttribute="leading" secondItem="cSS-CE-NjP" secondAttribute="leading" id="lmB-l1-Ava"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Garage Opener" id="Z3G-PP-ESc"/>
@@ -103,12 +102,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <color key="tintColor" red="0.2666666667" green="0.2666666667" blue="0.2666666667" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                        <color key="separatorColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="separatorColor" red="0.80000000000000004" green="0.80000000000000004" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <sections>
                             <tableViewSection headerTitle=" " footerTitle=" " id="muM-DW-Z92">
                                 <cells/>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Set or Update Password" footerTitle=" " id="Zio-BG-4Se">
+                            <tableViewSection headerTitle="Set Password" footerTitle=" " id="Zio-BG-4Se">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="dBz-h3-tFw">
                                         <autoresizingMask key="autoresizingMask"/>
@@ -121,8 +120,8 @@
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Enter Password" clearsOnBeginEditing="YES" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="uhr-rP-ZKc">
-                                                    <rect key="frame" x="116" y="11" width="276" height="21"/>
+                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Enter Password" clearsOnBeginEditing="YES" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="uhr-rP-ZKc">
+                                                    <rect key="frame" x="116" y="11" width="196" height="21"/>
                                                     <color key="tintColor" red="0.2666666667" green="0.2666666667" blue="0.2666666667" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" secureTextEntry="YES"/>
@@ -138,6 +137,7 @@
                                                 <constraint firstItem="uhr-rP-ZKc" firstAttribute="leading" secondItem="DFO-jl-8WF" secondAttribute="leadingMargin" constant="108" id="tDZ-Bm-7PY"/>
                                             </constraints>
                                         </tableViewCellContentView>
+                                        <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="RCP-lm-Lkg">
                                         <autoresizingMask key="autoresizingMask"/>
@@ -150,8 +150,8 @@
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="mPD-gz-VSp">
-                                                    <rect key="frame" x="335" y="6" width="51" height="31"/>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="mPD-gz-VSp">
+                                                    <rect key="frame" x="255" y="6" width="51" height="31"/>
                                                     <color key="tintColor" red="0.2666666667" green="0.2666666667" blue="0.2666666667" alpha="0.25" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="handleShowPasswordChange:" destination="V3F-zP-6mv" eventType="valueChanged" id="vgV-7k-YPt"/>
