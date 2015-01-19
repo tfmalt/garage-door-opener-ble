@@ -18,6 +18,7 @@ class SettingsController : UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.separatorColor = UIColor.colorWithHex("#cccccc")
         
         if let show = config.valueForKey("showPassword") as? Bool {
             showPasswordSwitch.on = show
@@ -55,4 +56,45 @@ class SettingsController : UITableViewController {
     
     func modalClosed() -> Void {
     }
+
+    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let header = UIView(frame: CGRectMake(0, 0, tableView.frame.size.width, 28))
+        // header.backgroundColor = UIColor.colorWithHex("#88ccFF")
+        header.backgroundColor = UIColor.colorWithHex("#EEEEEE")
+        
+        
+        if (section == 1) {
+            let text = UILabel(frame: CGRectMake(18, -4, tableView.frame.size.width, 28))
+            header.backgroundColor = UIColor.colorWithHex("#EEEEEE")
+            text.font = UIFont.systemFontOfSize(14.0)
+            text.textColor = UIColor.colorWithHex("#666666")
+            text.text = String("Update Password").uppercaseString
+            
+            let border = CALayer();
+            border.frame = CGRectMake(0, 22, tableView.frame.size.width, 0.5)
+            border.backgroundColor = UIColor.colorWithHex("#CCCCCC")?.CGColor
+        
+            header.addSubview(text)
+            header.layer.addSublayer(border)
+            
+            println("got header section: \(section)")
+        }
+        
+        return header
+    }
+    
+    override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footer = UIView(frame: CGRectMake(0, 0, tableView.frame.size.width, 40));
+        footer.backgroundColor = UIColor.colorWithHex("#EEEEEE")
+        if (section == 1) {
+            let border = CALayer();
+            border.frame = CGRectMake(0, 0, tableView.frame.size.width, 0.5)
+            border.backgroundColor = UIColor.colorWithHex("#CCCCCC")?.CGColor
+            
+            footer.layer.addSublayer(border)
+        }
+        
+        return footer
+    }
 }
+
