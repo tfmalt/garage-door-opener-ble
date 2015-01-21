@@ -17,9 +17,9 @@ ask for features or functionality.
 <img style="border: 1px solid #aaa" width="240px" src="http://tfmalt.github.io/garage-door-opener-ble/images/ios_settings.jpg">
 
 ### TODO
-* Stop and start capture device cleanly when
-** Changing views from settings to main
-** entering or coming back from the background
+* Stop and start capture device cleanly when:
+* Changing views from settings to main
+* entering or coming back from the background
 * Remember the last theme on startup.
 
 ### DONE
