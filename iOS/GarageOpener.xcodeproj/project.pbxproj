@@ -18,6 +18,7 @@
 		926AE0ED1A630A8000A19238 /* BTConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0EC1A630A8000A19238 /* BTConstants.swift */; };
 		92784C1F1A659E9B00AB46E9 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92784C1E1A659E9B00AB46E9 /* UIColorExtension.swift */; };
 		92784C211A659F3500AB46E9 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92784C201A659F3500AB46E9 /* UIImageExtension.swift */; };
+		92EE278B1A6FD63400EA980B /* AVCaptureDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EE278A1A6FD63400EA980B /* AVCaptureDeviceExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		926AE0EC1A630A8000A19238 /* BTConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTConstants.swift; sourceTree = "<group>"; };
 		92784C1E1A659E9B00AB46E9 /* UIColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		92784C201A659F3500AB46E9 /* UIImageExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
+		92EE278A1A6FD63400EA980B /* AVCaptureDeviceExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVCaptureDeviceExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 				926AE0EC1A630A8000A19238 /* BTConstants.swift */,
 				92784C1E1A659E9B00AB46E9 /* UIColorExtension.swift */,
 				92784C201A659F3500AB46E9 /* UIImageExtension.swift */,
+				92EE278A1A6FD63400EA980B /* AVCaptureDeviceExtension.swift */,
 			);
 			path = GarageOpener;
 			sourceTree = "<group>";
@@ -184,6 +187,7 @@
 				9224EB241A688CBC00981CBE /* SettingsController.swift in Sources */,
 				920E5EC11A615EAC00B0E5E3 /* ViewController.swift in Sources */,
 				926AE0E71A61D28600A19238 /* BTDiscoveryManager.swift in Sources */,
+				92EE278B1A6FD63400EA980B /* AVCaptureDeviceExtension.swift in Sources */,
 				92784C211A659F3500AB46E9 /* UIImageExtension.swift in Sources */,
 				922973C21A65891300C7E9A9 /* BTService.swift in Sources */,
 				926AE0ED1A630A8000A19238 /* BTConstants.swift in Sources */,
