@@ -26,10 +26,10 @@ class ViewController: UIViewController {
     var nc     = NSNotificationCenter.defaultCenter()
     var config = NSUserDefaults.standardUserDefaults()
     
-    let captureSession : AVCaptureSession = AVCaptureSession()
+    var captureSession : AVCaptureSession?
     var captureDevice  : AVCaptureDevice?
     var captureTimer   : NSTimer?
-    var imageOutput    : AVCaptureStillImageOutput = AVCaptureStillImageOutput()
+    var imageOutput    : AVCaptureStillImageOutput!
     var sessionQueue   : dispatch_queue_t!
     
     override func viewDidLoad() {
@@ -47,65 +47,104 @@ class ViewController: UIViewController {
         self.updateOpenButtonWait()
         self.registerObservers()
         self.setTheme()
-        self.setupCaptureSession()
-        // self.configureCaptureDevice()
-        self.captureImage()
-        self.setupImageCaptureTimer()
+        
+        if (config.boolForKey("useAutoTheme") == true) {
+            self.setupCaptureSession()
+            self.beginCaptureSession()
+            
+            // self.configureCaptureDevice()
+            self.setupImageCaptureTimer()
+
+        }
         
     }
     
-    func setupImageCaptureTimer() {
-        
-        self.ISOValueLabel.text = ""
-        self.expValueLabel.text = ""
-        self.lumValueLabel.text = ""
-        
-        self.captureTimer = NSTimer.scheduledTimerWithTimeInterval(
-            1.0,
-            target: self,
-            selector: "doActualCapture",
-            userInfo: nil,
-            repeats: true
-        )
-    }
-    
-    func setupCaptureSession() {
+
+    func setCaptureSessionPreset(preset: NSString!) {
         dispatch_async(self.sessionQueue, {
-            println("Starting to configure capture session.")
-            if self.captureSession.canSetSessionPreset(AVCaptureSessionPreset352x288) {
-                self.captureSession.sessionPreset = AVCaptureSessionPreset352x288
-                println("  Set capture preset to 352x288")
-            } else {
-                println("  Could not set preset to 352x288 -> implement fallback")
-            }
-            
-            self.captureDevice = AVCaptureDevice.deviceWithVideoInFront()
-            self.imageOutput.outputSettings = [AVVideoCodecKey : AVVideoCodecJPEG]
-            
-            // be a bit paranoid about the availablity of a camera.
-            if let camera : AVCaptureDevice = self.captureDevice {
-                var input  = AVCaptureDeviceInput(device: camera, error: nil)
-                var output = self.imageOutput
-                
-                if self.captureSession.canAddInput(input) {
-                    self.captureSession.addInput(AVCaptureDeviceInput(device: camera, error: nil))
-                    println("  Added front camera as input")
+            println("Set capture session preset:")
+            if let session = self.captureSession {
+                if session.canSetSessionPreset(preset) {
+                    session.sessionPreset = preset
+                    println("  Set capture preset to: \(preset)")
                 } else {
-                    println("  Could not add front camera as input")
+                    println("  Could not set preset: \(preset) -> implement fallback")
                 }
-                
-                if self.captureSession.canAddOutput(output) {
-                    self.captureSession.addOutput(output)
+            }
+        })
+    }
+    
+    func addCaptureSessionInputDevice() {
+        dispatch_async(self.sessionQueue, {
+            println("Adding input device:")
+            if let session = self.captureSession {
+                if let camera = self.captureDevice {
+                    var input  = AVCaptureDeviceInput(device: camera, error: nil)
+                    
+                    if session.canAddInput(input) {
+                        session.addInput(AVCaptureDeviceInput(device: camera, error: nil))
+                        println("  Added front camera as input")
+                    } else {
+                        println("  Could not add front camera as input")
+                    }
+                    
+                    println("  active format: \(camera.activeFormat.description)")
+                }
+            }
+        })
+        
+    }
+    
+    
+    func addCaptureSessionOutputDevice() {
+        dispatch_async(self.sessionQueue, {
+            println("Adding output device:")
+            if let session = self.captureSession {
+                if session.canAddOutput(self.imageOutput) {
+                    session.addOutput(self.imageOutput)
                     println("  Added output object as output")
                 } else {
                     println("  Could not add output object -> figure out why")
                 }
-                
-                println("  active format: \(camera.activeFormat.description)")
+            }
+        })
+    }
+    
+    
+    // beginning the capture session.
+    func setupCaptureSession() {
+        self.captureSession             = AVCaptureSession()
+        self.imageOutput                = AVCaptureStillImageOutput()
+        self.imageOutput.outputSettings = [AVVideoCodecKey : AVVideoCodecJPEG]
+        self.captureDevice              = AVCaptureDevice.deviceWithVideoInFront()
+        
+        self.setCaptureSessionPreset(AVCaptureSessionPreset352x288)
+        self.addCaptureSessionInputDevice()
+        self.addCaptureSessionOutputDevice()
+    }
+    
+    
+    func beginCaptureSession() {
+        dispatch_async(self.sessionQueue, {
+            println("Begin Capture Session")
+            if let camera = self.captureDevice {
+                var cmtime = CMTimeGetSeconds(camera.exposureDuration)
+                println("  exposure duration: \(cmtime)")
             }
             
-            println("Configured capture session")
+            if let session = self.captureSession {
+                session.startRunning()
+                self.configureCaptureDevice()
+            }
         })
+    }
+    
+    
+    func endCaptureSession() {
+        if let session = self.captureSession {
+            println("Stopping capture session")
+            session.stopRunning()
+        }
     }
     
     
@@ -140,21 +179,23 @@ class ViewController: UIViewController {
     }
     
     
-    func captureImage() {
-        dispatch_async(self.sessionQueue, {
-            var cmtime = CMTimeGetSeconds(self.captureDevice!.exposureDuration)
-            println("Capturing image")
-            println("  exposure duration: \(cmtime)")
-            
-            self.captureSession.startRunning()
-            
-            self.configureCaptureDevice()
-        })
+    func setupImageCaptureTimer() {
+        
+        self.ISOValueLabel.text = ""
+        self.expValueLabel.text = ""
+        self.lumValueLabel.text = ""
+        
+        self.captureTimer = NSTimer.scheduledTimerWithTimeInterval(
+            1.0,
+            target: self,
+            selector: "doActualCapture",
+            userInfo: nil,
+            repeats: true
+        )
     }
     
+    
     func doActualCapture() {
-        println("got call do do actual capture")
-        
         self.imageOutput.captureStillImageAsynchronouslyFromConnection(
             self.imageOutput.connectionWithMediaType(AVMediaTypeVideo),
             completionHandler: self.handleInputImage
@@ -164,35 +205,34 @@ class ViewController: UIViewController {
     
     /// Does the actual handling of the image
     func handleInputImage(buffer: CMSampleBuffer!, error: NSError!) {
-        println("  Got call to handle input image")
-        
-        if (buffer == nil) {
-            println("    Got empty image buffer - an error")
-            return
-        }
-        
-        var imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer)
-        var image = UIImage(data: imageData)!
-        println("    image size: \(image.size.width), \(image.size.height)")
-        
-        var luminance = image.luminance()
-        
-        themeImage.image = image
-        
-        if let camera = self.captureDevice {
-            var duration = CMTimeGetSeconds(camera.exposureDuration) * 1000
+        dispatch_async(dispatch_get_main_queue(), {
+            println("Handle input image:")
+            if (buffer == nil) {
+                println("Got empty image buffer - an error")
+                return
+            }
             
-            var time = Int(round(duration))
-            var iso  = Int(camera.ISO)
+            var imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer)
+            var image     = UIImage(data: imageData)!
+            var luminance = image.luminance()
             
-            println("    exposure time: \(time)/1000)")
-            println("    ISO: \(iso)")
-            println("    the luminance I got: \(luminance)")
+            println("  image size: \(image.size.width), \(image.size.height)")
             
-            self.ISOValueLabel.text = String(iso)
-            self.expValueLabel.text = "\(time)/1000 s"
-            self.lumValueLabel.text = String(format: "%.2f", Float(luminance))
-        }
+            self.themeImage.image = image
+            
+            self.setAutoTheme(luminance)
+            
+            
+            if let camera = self.captureDevice {
+                var duration = CMTimeGetSeconds(camera.exposureDuration) * 1000
+                var time     = Int(round(duration))
+                var iso      = Int(camera.ISO)
+                
+                self.ISOValueLabel.text = String(iso)
+                self.expValueLabel.text = "\(time)/1000 s"
+                self.lumValueLabel.text = String(format: "%.2f", Float(luminance))
+            }
+        })
     }
     
     func setTheme() {
@@ -203,6 +243,19 @@ class ViewController: UIViewController {
         }
         
         self.setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    func setAutoTheme(luminance: CGFloat) {
+        if self.config.boolForKey("useAutoTheme") == false {
+            return
+        }
+        
+        if (luminance >= 0.5) {
+            self.setLightTheme()
+        }
+        else if (luminance < 0.5) {
+            self.setDarkTheme()
+        }
     }
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -230,12 +283,13 @@ class ViewController: UIViewController {
         println("App will resign active")
         self.updateOpenButtonWait()
         
-        self.captureSession.stopRunning()
-        println("  stopping capture session")
+        self.endCaptureSession()
+        
     }
     
     func appWillTerminate(notification: NSNotification) {
         println("App will terminate")
+        self.endCaptureSession()
     }
     
     func registerObservers() {
@@ -424,7 +478,7 @@ class ViewController: UIViewController {
     func makeThemeImageCircular() {
         themeImage.clipsToBounds = true
         themeImage.layer.borderWidth = 2.0
-        themeImage.layer.borderColor = UIColor.colorWithHex("#CCCCCC")?.CGColor
+        themeImage.layer.borderColor = UIColor.colorWithHex("#888888")?.CGColor
         themeImage.layer.cornerRadius = (themeImage.frame.size.width / 2)
     }
     
