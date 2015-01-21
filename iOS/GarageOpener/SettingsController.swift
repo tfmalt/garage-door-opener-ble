@@ -9,17 +9,28 @@
 import Foundation
 import UIKit
 
-class SettingsController : UITableViewController {
+class SettingsController : UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var passwordField: UITextField!
     @IBOutlet weak var showPasswordSwitch: UISwitch!
+    @IBOutlet weak var darkThemeSwitch: UISwitch!
+    @IBOutlet weak var themeAutoSwitch: UISwitch!
     
     var config = NSUserDefaults.standardUserDefaults()
+    var nc     = NSNotificationCenter.defaultCenter()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.separatorColor = UIColor.colorWithHex("#cccccc")
+        self.passwordField.delegate = self
         
+        tableView.separatorColor = UIColor.colorWithHex("#cccccc")
+        self.configureSettings()
+        
+        println("Loaded settings controller")
+    }
+    
+    /// Setting up the switches to default
+    func configureSettings() {
         if let show = config.valueForKey("showPassword") as? Bool {
             showPasswordSwitch.on = show
         }
@@ -28,56 +39,86 @@ class SettingsController : UITableViewController {
             passwordField.text = pass
         }
         
-        passwordField.secureTextEntry = !showPasswordSwitch.on
+        if let darkOn = config.valueForKey("useDarkTheme") as? Bool {
+            darkThemeSwitch.on = darkOn
+        }
         
-        println("Loaded settings controller")
+        if let autoOn = config.valueForKey("useAutoTheme") as? Bool {
+            themeAutoSwitch.on = autoOn
+            darkThemeSwitch.on = false // these are mutually excluded
+            config.setBool(false, forKey: "useDarkTheme")
+        }
+        
+        passwordField.secureTextEntry = !showPasswordSwitch.on
     }
+    
+    
+    @IBAction func handleDarkThemeChange(sender: UISwitch) {
+        println("dark theme toggle changed: \(sender.on)")
+        
+        config.setBool(sender.on, forKey: "useDarkTheme")
+        config.setBool(!(sender.on), forKey: "useAutoTheme")
+    }
+    
     
     @IBAction func handleShowPasswordChange(sender: UISwitch) {
         println("show password toggle changed: \(sender.on)")
         
         passwordField.secureTextEntry = !sender.on
-        
         config.setBool(sender.on, forKey: "showPassword")
     }
     
     @IBAction func handleDonePressed(sender: AnyObject) {
+        config.setObject(passwordField.text, forKey: "password")
+        
+        self.passwordField.resignFirstResponder()
         self.dismissViewControllerAnimated(true, completion: nil)
+        
         println("modal closed: \(passwordField.text)")
         
-        config.setObject(passwordField.text, forKey: "password")
+        nc.postNotificationName("settingsUpdated", object: config)
+        
     }
     
     @IBAction func handleCancelPressed(sender: AnyObject) {
         self.dismissViewControllerAnimated(true, completion: nil)
         println("modal closed")
-
+        
     }
     
     func modalClosed() -> Void {
     }
 
+    
+    /// Iterating over the sections in the table view to update the 
+    /// appearance by changing font and case to make it look more like the
+    /// standard settings view in the settings app
+    ///
+    /// :return: UIView
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = UIView(frame: CGRectMake(0, 0, tableView.frame.size.width, 28))
-        // header.backgroundColor = UIColor.colorWithHex("#88ccFF")
+
         header.backgroundColor = UIColor.colorWithHex("#EEEEEE")
         
-        
         if (section == 1) {
-            let text = UILabel(frame: CGRectMake(18, -4, tableView.frame.size.width, 28))
-            header.backgroundColor = UIColor.colorWithHex("#EEEEEE")
-            text.font = UIFont.systemFontOfSize(14.0)
-            text.textColor = UIColor.colorWithHex("#666666")
-            text.text = String("Update Password").uppercaseString
             
-            let border = CALayer();
-            border.frame = CGRectMake(0, 22, tableView.frame.size.width, 0.5)
-            border.backgroundColor = UIColor.colorWithHex("#CCCCCC")?.CGColor
-        
+            let text   : UILabel = self.getLabel()
+            let border : CALayer = self.getBottomBorder()
+            
+            text.text = String("authentication").uppercaseString
+            
             header.addSubview(text)
             header.layer.addSublayer(border)
+        }
+        
+        if (section == 2) {
+            let text   : UILabel = self.getLabel()
+            let border : CALayer = self.getBottomBorder()
             
-            println("got header section: \(section)")
+            text.text = String("Theme").uppercaseString
+            
+            header.addSubview(text)
+            header.layer.addSublayer(border)
         }
         
         return header
@@ -86,7 +127,8 @@ class SettingsController : UITableViewController {
     override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         let footer = UIView(frame: CGRectMake(0, 0, tableView.frame.size.width, 40));
         footer.backgroundColor = UIColor.colorWithHex("#EEEEEE")
-        if (section == 1) {
+        
+        if (section == 1 || section == 2) {
             let border = CALayer();
             border.frame = CGRectMake(0, 0, tableView.frame.size.width, 0.5)
             border.backgroundColor = UIColor.colorWithHex("#CCCCCC")?.CGColor
@@ -95,6 +137,33 @@ class SettingsController : UITableViewController {
         }
         
         return footer
+    }
+    
+    
+    func getBottomBorder() -> CALayer {
+        let border = CALayer();
+        
+        border.frame = CGRectMake(0, 22, tableView.frame.size.width, 0.5)
+        border.backgroundColor = UIColor.colorWithHex("#CCCCCC")?.CGColor
+        
+        return border
+    }
+    
+    func getLabel() -> UILabel {
+        let text = UILabel(
+            frame: CGRectMake(18, -4 ,
+            tableView.frame.size.width, 28)
+        )
+        
+        text.font = UIFont.systemFontOfSize(14.0)
+        text.textColor = UIColor.colorWithHex("#666666")
+        
+        return text
+    }
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
 
