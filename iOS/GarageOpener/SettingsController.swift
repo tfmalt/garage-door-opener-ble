@@ -45,8 +45,12 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         
         if let autoOn = config.valueForKey("useAutoTheme") as? Bool {
             themeAutoSwitch.on = autoOn
-            darkThemeSwitch.on = false // these are mutually excluded
-            config.setBool(false, forKey: "useDarkTheme")
+            
+            if autoOn == true {
+                // theme auto switch takes precedence.
+                darkThemeSwitch.on = false // these are mutually exclusive
+                config.setBool(false, forKey: "useDarkTheme")
+            }
         }
         
         passwordField.secureTextEntry = !showPasswordSwitch.on
@@ -57,9 +61,24 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         println("dark theme toggle changed: \(sender.on)")
         
         config.setBool(sender.on, forKey: "useDarkTheme")
-        config.setBool(!(sender.on), forKey: "useAutoTheme")
+        
+        if (sender.on == true) {
+            config.setBool(false, forKey: "useAutoTheme")
+            themeAutoSwitch.setOn(false, animated: true)
+        }
     }
     
+    @IBAction func handleAutoThemeChange(sender: UISwitch) {
+        println("auto theme toggle changed: \(sender.on)")
+        
+        // auto theme and dark theme are mutually exclusive
+        config.setBool(sender.on, forKey: "useAutoTheme")
+        
+        if (sender.on == true) {
+            config.setBool(false, forKey: "useDarkTheme")
+            darkThemeSwitch.setOn(false, animated: true)
+        }
+    }
     
     @IBAction func handleShowPasswordChange(sender: UISwitch) {
         println("show password toggle changed: \(sender.on)")
