@@ -45,12 +45,6 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         
         if let autoOn = config.valueForKey("useAutoTheme") as? Bool {
             themeAutoSwitch.on = autoOn
-            
-            if autoOn == true {
-                // theme auto switch takes precedence.
-                darkThemeSwitch.on = false // these are mutually exclusive
-                config.setBool(false, forKey: "useDarkTheme")
-            }
         }
         
         passwordField.secureTextEntry = !showPasswordSwitch.on
@@ -58,31 +52,14 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
     
     
     @IBAction func handleDarkThemeChange(sender: UISwitch) {
-        println("dark theme toggle changed: \(sender.on)")
-        
         config.setBool(sender.on, forKey: "useDarkTheme")
-        
-        if (sender.on == true) {
-            config.setBool(false, forKey: "useAutoTheme")
-            themeAutoSwitch.setOn(false, animated: true)
-        }
     }
     
     @IBAction func handleAutoThemeChange(sender: UISwitch) {
-        println("auto theme toggle changed: \(sender.on)")
-        
-        // auto theme and dark theme are mutually exclusive
         config.setBool(sender.on, forKey: "useAutoTheme")
-        
-        if (sender.on == true) {
-            config.setBool(false, forKey: "useDarkTheme")
-            darkThemeSwitch.setOn(false, animated: true)
-        }
     }
     
     @IBAction func handleShowPasswordChange(sender: UISwitch) {
-        println("show password toggle changed: \(sender.on)")
-        
         passwordField.secureTextEntry = !sender.on
         config.setBool(sender.on, forKey: "showPassword")
     }
@@ -103,7 +80,7 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         self.dismissViewControllerAnimated(true, completion: nil)
         self.passwordField.resignFirstResponder()
         
-        nc.postNotificationName("settingsNotUpdated", object: config)
+        nc.postNotificationName("settingsCancelled", object: config)
     }
     
     
