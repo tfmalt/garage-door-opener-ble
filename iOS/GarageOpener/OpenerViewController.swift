@@ -52,12 +52,21 @@ class OpenerViewController: UIViewController {
         self.setTheme()
         
         if (config.boolForKey("useAutoTheme") == true) {
-            self.setupCaptureSession()
-            self.beginCaptureSession()
-            self.setupImageCaptureTimer()
+            self.setupAutoTheme()
         } else {
             self.setupWithoutAutoTheme()
         }
+    }
+    
+    
+    func setupAutoTheme() {
+        ISOLabel.text = "ISO:"
+        expLabel.text = "Exp:"
+        lumLabel.text = "Lum:"
+        
+        self.setupCaptureSession()
+        self.beginCaptureSession()
+        self.setupImageCaptureTimer()
     }
     
     
@@ -72,6 +81,12 @@ class OpenerViewController: UIViewController {
     }
     
 
+    ///////////////////////////////////////////////////////////////////////
+    //
+    //  Setting up the capture session and dealing with functionality
+    //  relating to automatic theme change
+    //
+    
     func setCaptureSessionPreset(preset: NSString!) {
         dispatch_async(self.sessionQueue, {
             println("Set capture session preset:")
@@ -85,6 +100,7 @@ class OpenerViewController: UIViewController {
             }
         })
     }
+    
     
     func addCaptureSessionInputDevice() {
         dispatch_async(self.sessionQueue, {
@@ -250,6 +266,13 @@ class OpenerViewController: UIViewController {
         })
     }
     
+    
+    ///////////////////////////////////////////////////////////////////////
+    //
+    //  Functions relating to theming and adjusting the visual style
+    //  depending on settings
+    //
+    
     func setTheme() {
         if (config.boolForKey("useDarkTheme")) {
             self.setDarkTheme()
@@ -259,6 +282,7 @@ class OpenerViewController: UIViewController {
         
         self.setNeedsStatusBarAppearanceUpdate()
     }
+    
     
     func setAutoTheme(luminance: CGFloat) {
         if self.config.boolForKey("useAutoTheme") == false {
@@ -271,15 +295,12 @@ class OpenerViewController: UIViewController {
         else if (luminance < 0.5) {
             self.setDarkThemeAnimated()
         }
-    }
-    
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        if (config.boolForKey("useDarkTheme")) {
-            return UIStatusBarStyle.LightContent
-        } else {
-            return UIStatusBarStyle.Default
+        
+        delay(0.5) {
+            self.setNeedsStatusBarAppearanceUpdate()
         }
     }
+    
     
     func setDarkThemeAnimated() {
         UIView.animateWithDuration(1.0, animations: {
@@ -290,6 +311,7 @@ class OpenerViewController: UIViewController {
         activityIndicator.color = UIColor.colorWithHex("#CCCCCC")
     }
     
+    
     func setLightThemeAnimated() {
         UIView.animateWithDuration(1.0, animations: {
             self.view.backgroundColor = UIColor.whiteColor()
@@ -299,12 +321,14 @@ class OpenerViewController: UIViewController {
         activityIndicator.color = UIColor.colorWithHex("#888888")
     }
     
+    
     func setDarkTheme() {
         self.view.backgroundColor = UIColor.blackColor()
         
         statusLabel.textColor = UIColor.colorWithHex("#CCCCCC")
         activityIndicator.color = UIColor.colorWithHex("#CCCCCC")
     }
+    
     
     func setLightTheme() {
         self.view.backgroundColor = UIColor.whiteColor()
@@ -313,49 +337,20 @@ class OpenerViewController: UIViewController {
         activityIndicator.color = UIColor.colorWithHex("#888888")
     }
 
-    ///////////////////////////////////////////////////////////////////////
-    //  App activity notifications
-    //
     
-    func appWillResignActive(notification: NSNotification) {
-        println("App will resign active")
-    }
-    
-    
-    func appDidBecomeActive(notification: NSNotification) {
-        println("App did become active")
+    override func preferredStatusBarStyle() -> UIStatusBarStyle {
+        if self.view.backgroundColor == UIColor.blackColor() {
+            return UIStatusBarStyle.LightContent
+        } else {
+            return UIStatusBarStyle.Default
+        }
     }
 
     
-    func appWillTerminate(notification: NSNotification) {
-        println("App will terminate")
-        
-        if self.config.boolForKey("useAutoTheme") == true {
-            self.endCaptureSession()
-        }
-    }
-    
-    func appWillEnterForeground(notification: NSNotification) {
-        println("App will enter foreground.")
- 
-        if self.config.boolForKey("useAutoTheme") == true {
-            self.beginCaptureSession()
-            self.setupImageCaptureTimer()
-        } else {
-            self.setupWithoutAutoTheme()
-        }
-    }
-    
-    func appDidEnterBackground(notification: NSNotification) {
-        println("App did enter background")
-        self.updateOpenButtonWait()
-        
-        if self.config.boolForKey("useAutoTheme") == true {
-            self.captureTimer?.invalidate()
-            self.endCaptureSession()
-        }
-    }
-    
+    ///////////////////////////////////////////////////////////////////////
+    //
+    //  Observers and their handlers
+    //
     
     /// The full list of events the app is listening to.
     func registerObservers() {
@@ -428,18 +423,87 @@ class OpenerViewController: UIViewController {
             name: "settingsUpdated",
             object: nil
         )
+        
+        nc.addObserver(
+            self,
+            selector: Selector("handleSettingsCancelled"),
+            name: "settingsCancelled",
+            object: nil
+        )
     }
     
-    func handleSettingsUpdated() {
-        println("Got told settings have updated")
-        self.setTheme() // The only thing I currently have to keep track of.
+    ///////////////////////////////////////////////////////////////////////
+    //
+    //  App activity notifications
+    //
+    
+    func appWillResignActive(notification: NSNotification) {
+        println("App will resign active")
     }
+    
+    
+    func appDidBecomeActive(notification: NSNotification) {
+        println("App did become active")
+    }
+    
+    
+    func appWillTerminate(notification: NSNotification) {
+        println("App will terminate")
+        
+        if self.config.boolForKey("useAutoTheme") == true {
+            self.endCaptureSession()
+        }
+    }
+    
+    func appWillEnterForeground(notification: NSNotification) {
+        println("App will enter foreground.")
+        
+        if self.config.boolForKey("useAutoTheme") == true {
+            self.beginCaptureSession()
+            self.setupImageCaptureTimer()
+        } else {
+            self.setupWithoutAutoTheme()
+        }
+    }
+    
+    func appDidEnterBackground(notification: NSNotification) {
+        println("App did enter background")
+        self.updateOpenButtonWait()
+        
+        if self.config.boolForKey("useAutoTheme") == true {
+            self.captureTimer?.invalidate()
+            self.endCaptureSession()
+        }
+    }
+
+    
+    func handleSettingsUpdated() {
+        println("View told settings have updated")
+        self.setTheme()
+        
+        if config.boolForKey("useAutoTheme") == true {
+            // we know this changed from false to true
+            self.setupAutoTheme()
+        } else {
+            self.captureTimer?.invalidate()
+            self.endCaptureSession()
+            self.setupWithoutAutoTheme()
+        }
+    }
+    
+    
+    func handleSettingsCancelled() {
+        println("View told settings was cancelled")
+        
+    }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
+    
     func getConnectionBar(strength: Int) -> String {
         let s : String = "\u{25A1}"
         let b : String = "\u{25A0}"
