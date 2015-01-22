@@ -8,7 +8,7 @@
         <!--Garage Opener-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Garage_Opener" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="OpenerViewController" customModule="Garage_Opener" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -66,7 +66,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="tFD-ek-ezk">
-                                <rect key="frame" x="142" y="406" width="37" height="37"/>
+                                <rect key="frame" x="142" y="431" width="37" height="37"/>
                                 <color key="color" red="0.53333333333333333" green="0.53333333333333333" blue="0.53333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </activityIndicatorView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ISO:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i5S-Zj-Z5C">
@@ -130,14 +130,6 @@
                                 <color key="textColor" red="0.80000000000000004" green="0.80000000000000004" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dtk-Gp-arN">
-                                <rect key="frame" x="120" y="468" width="80" height="80"/>
-                                <color key="backgroundColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="80" id="Ili-5b-YoN"/>
-                                    <constraint firstAttribute="width" constant="80" id="VqM-He-6Y4"/>
-                                </constraints>
-                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -147,7 +139,7 @@
                             <constraint firstItem="tFD-ek-ezk" firstAttribute="centerX" secondItem="cSS-CE-NjP" secondAttribute="centerX" id="A2q-F7-wWe"/>
                             <constraint firstItem="ZAw-Kl-I3f" firstAttribute="top" secondItem="Rgj-Sv-BOL" secondAttribute="top" id="Azz-3W-xEq"/>
                             <constraint firstItem="OPy-Bo-vnd" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="Baz-ue-miP"/>
-                            <constraint firstItem="tFD-ek-ezk" firstAttribute="top" secondItem="cSS-CE-NjP" secondAttribute="bottom" constant="20" id="LEo-fu-KJS"/>
+                            <constraint firstItem="tFD-ek-ezk" firstAttribute="top" secondItem="cSS-CE-NjP" secondAttribute="bottom" constant="45" id="LEo-fu-KJS"/>
                             <constraint firstItem="i5S-Zj-Z5C" firstAttribute="top" secondItem="ZyJ-jO-Dcm" secondAttribute="top" id="MUN-aG-B2Q"/>
                             <constraint firstItem="kcN-ha-3wI" firstAttribute="bottom" secondItem="OPy-Bo-vnd" secondAttribute="bottom" id="PeZ-6f-rY4"/>
                             <constraint firstAttribute="bottom" secondItem="kcN-ha-3wI" secondAttribute="bottom" constant="20" symbolic="YES" id="QBu-IQ-5dF"/>
@@ -165,23 +157,23 @@
                             <constraint firstItem="eyp-Lh-zJz" firstAttribute="leading" secondItem="ZAw-Kl-I3f" secondAttribute="leading" id="lft-41-4JU"/>
                             <constraint firstItem="kcN-ha-3wI" firstAttribute="leading" secondItem="cSS-CE-NjP" secondAttribute="leading" id="lmB-l1-Ava"/>
                             <constraint firstItem="eyp-Lh-zJz" firstAttribute="top" secondItem="3j5-tO-ZKz" secondAttribute="top" id="prt-l1-gnG"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="dtk-Gp-arN" secondAttribute="bottom" constant="20" id="qj9-gY-efS"/>
                             <constraint firstItem="eyp-Lh-zJz" firstAttribute="height" secondItem="ZAw-Kl-I3f" secondAttribute="height" id="reS-2F-o6b"/>
                             <constraint firstAttribute="centerY" secondItem="BRQ-06-O5h" secondAttribute="centerY" constant="60" id="spI-Px-kB7"/>
-                            <constraint firstAttribute="centerX" secondItem="dtk-Gp-arN" secondAttribute="centerX" id="wPf-13-lmc"/>
                             <constraint firstItem="eyp-Lh-zJz" firstAttribute="leading" secondItem="i5S-Zj-Z5C" secondAttribute="leading" id="xfI-Qz-hIR"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Garage Opener" id="Z3G-PP-ESc"/>
                     <connections>
+                        <outlet property="ExpLabel" destination="eyp-Lh-zJz" id="Mmu-7H-Rg5"/>
+                        <outlet property="ISOLabel" destination="i5S-Zj-Z5C" id="CoQ-Z9-EGu"/>
                         <outlet property="ISOValueLabel" destination="ZyJ-jO-Dcm" id="pf4-Nz-KFh"/>
+                        <outlet property="LumLabel" destination="ZAw-Kl-I3f" id="PbQ-0K-yjM"/>
                         <outlet property="activityIndicator" destination="tFD-ek-ezk" id="XRe-i3-MfI"/>
                         <outlet property="expValueLabel" destination="3j5-tO-ZKz" id="ogl-rO-ZEs"/>
                         <outlet property="lumValueLabel" destination="Rgj-Sv-BOL" id="2jJ-lB-HmM"/>
                         <outlet property="openButton" destination="BRQ-06-O5h" id="7xZ-ps-5wF"/>
                         <outlet property="rssiLabel" destination="kcN-ha-3wI" id="uPz-eq-w0j"/>
                         <outlet property="statusLabel" destination="cSS-CE-NjP" id="upw-05-0he"/>
-                        <outlet property="themeImage" destination="dtk-Gp-arN" id="zMd-6p-TNb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
