@@ -17,6 +17,8 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     
     let btConst = BTConstants()
     
+    var rssiTimer : NSTimer?
+    
     var activePeripheral : CBPeripheral? {
         didSet {
             println("activePeripheral got set")
@@ -34,14 +36,29 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     override init() {
         super.init()
         
-        nc.addObserver(self, selector: Selector("appWillResignActive"), name: UIApplicationWillResignActiveNotification, object: nil)
+        nc.addObserver(
+            self,
+            selector: Selector("appDidEnterBackground"),
+            name: UIApplicationDidEnterBackgroundNotification,
+            object: nil)
         
-        nc.addObserver(self, selector: Selector("appDidBecomeActive"), name: UIApplicationDidBecomeActiveNotification, object: nil)
+        nc.addObserver(
+            self,
+            selector: Selector("appWillEnterForeground"),
+            name: UIApplicationWillEnterForegroundNotification,
+            object: nil
+        )
         
         let queue = dispatch_queue_create("no.malt", DISPATCH_QUEUE_SERIAL)
         centralManager = CBCentralManager(delegate: self, queue: queue)
         
-        NSTimer.scheduledTimerWithTimeInterval(2.0, target: self, selector: Selector("doReadRSSI"), userInfo: nil, repeats: true)
+        rssiTimer = NSTimer.scheduledTimerWithTimeInterval(
+            2.0,
+            target: self,
+            selector: Selector("doReadRSSI"),
+            userInfo: nil,
+            repeats: true
+        )
     }
     
     func sayHello() -> String {
@@ -50,8 +67,8 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     }
     
     
-    func appWillResignActive() {
-        println("Discovery Manager: will resign active")
+    func appDidEnterBackground() {
+        println("Discovery Manager: did enter background")
         
         if (self.activePeripheral == nil) {
             println("  Got nil activePeripheral. Not connected.")
@@ -71,8 +88,8 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     }
     
     
-    func appDidBecomeActive() {
-        println("Discovery Manager: did become active")
+    func appWillEnterForeground() {
+        println("Discovery Manager: will enter foreground")
         
         if self.centralManager?.state == CBCentralManagerState.PoweredOn {
             self.startScanning()
@@ -98,7 +115,10 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
         nc.postNotificationName("btStateChangedNotification", object: "Scanning")
         
         if let central = self.centralManager {
-            central.scanForPeripheralsWithServices([CBUUID(string: btConst.SERVICE_UUID)], options: nil)
+            central.scanForPeripheralsWithServices(
+                [CBUUID(string: btConst.SERVICE_UUID)],
+                options: nil
+            )
         }
     }
     
@@ -149,12 +169,19 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     func centralManager(central: CBCentralManager!, didDisconnectPeripheral peripheral: CBPeripheral!, error: NSError!) {
         println("Called did Disconnect Peripheral: \(peripheral)")
         
-        nc.postNotificationName("btStateChangedNotification", object: "Disconnected", userInfo: ["peripheral": peripheral])
+        nc.postNotificationName(
+            "btStateChangedNotification",
+            object: "Disconnected",
+            userInfo: ["peripheral": peripheral]
+        )
         
-        // when activePeripheral is set to nil we know we don't need to reconnect.
-        if (peripheral == self.activePeripheral) {
-            self.resetConnection()
-            self.startScanning()
+        delay(2.0) {
+            // wait two seconds before trying to connect again.
+            // when activePeripheral is set to nil we know we don't need to reconnect.
+            if (peripheral == self.activePeripheral) {
+                self.resetConnection()
+                self.startScanning()
+            }
         }
     }
     
