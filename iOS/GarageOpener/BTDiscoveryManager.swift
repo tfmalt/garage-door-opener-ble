@@ -251,6 +251,7 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
         case CBCentralManagerState.PoweredOn:
             println("BLE state Powered On")
             state = nil
+            self.startScanning()
             break
         case CBCentralManagerState.Unknown:
             println("BLE state unknown")
