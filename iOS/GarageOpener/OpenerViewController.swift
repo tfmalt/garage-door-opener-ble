@@ -165,15 +165,18 @@ class OpenerViewController: UIViewController {
     
     
     func endCaptureSession() {
-        if self.config.boolForKey("useAutoTheme") == true {
-            dispatch_async(self.sessionQueue, {
-                
-                if let session = self.captureSession {
+        dispatch_async(self.sessionQueue, {
+            if let session = self.captureSession {
+                if session.running == true {
                     println("Stopping capture session")
                     session.stopRunning()
                 }
-            })
-        }
+            }
+            
+            self.captureSession = nil
+            self.imageOutput    = nil
+            self.captureDevice  = nil
+        })
     }
     
     
@@ -210,18 +213,29 @@ class OpenerViewController: UIViewController {
     
     
     func setupImageCaptureTimer() {
+        println("Told to setup new image capture timer:")
+        if (self.captureTimer == nil || self.captureTimer?.valid == false) {
+            println("  Starting new capture NSTimer 4.0s")
+            self.captureTimer = NSTimer.scheduledTimerWithTimeInterval(
+                4.0,
+                target: self,
+                selector: "doActualCapture",
+                userInfo: nil,
+                repeats: true
+            )
+        }
+    }
+    
+    func removeImageCaptureTimer() {
+        println("Told to remove image capture timer.")
+        if let timer : NSTimer = self.captureTimer {
+            if timer.valid == true {
+                println("  Found running timer - invalidating")
+                timer.invalidate()
+            }
+        }
         
-        self.ISOValueLabel.text = ""
-        self.expValueLabel.text = ""
-        self.lumValueLabel.text = ""
-        
-        self.captureTimer = NSTimer.scheduledTimerWithTimeInterval(
-            4.0,
-            target: self,
-            selector: "doActualCapture",
-            userInfo: nil,
-            repeats: true
-        )
+        self.captureTimer = nil
     }
     
     
@@ -229,12 +243,17 @@ class OpenerViewController: UIViewController {
         println("Do actual capture called:")
         if let session = self.captureSession {
             if session.running == true {
-                println("  Session running - capture in progress")
-                self.imageOutput.captureStillImageAsynchronouslyFromConnection(
-                    self.imageOutput.connectionWithMediaType(AVMediaTypeVideo),
-                    completionHandler: self.handleInputImage
-                )
-                
+                println("  Session running")
+                if let connection = self.imageOutput.connectionWithMediaType(AVMediaTypeVideo) {
+                    println("    Got connection")
+                    if connection.active == true {
+                        println("      Connection active - doing capture")
+                        self.imageOutput.captureStillImageAsynchronouslyFromConnection(
+                            self.imageOutput.connectionWithMediaType(AVMediaTypeVideo),
+                            completionHandler: self.handleInputImage
+                        )
+                    }
+                }
             }
         }
     }
@@ -459,8 +478,7 @@ class OpenerViewController: UIViewController {
         println("App will enter foreground.")
         
         if self.config.boolForKey("useAutoTheme") == true {
-            self.beginCaptureSession()
-            self.setupImageCaptureTimer()
+            self.setupAutoTheme()
         } else {
             self.setupWithoutAutoTheme()
         }
@@ -471,21 +489,30 @@ class OpenerViewController: UIViewController {
         self.updateOpenButtonWait()
         
         if self.config.boolForKey("useAutoTheme") == true {
-            self.captureTimer?.invalidate()
+            self.removeImageCaptureTimer()
             self.endCaptureSession()
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////
+    //
+    //  Settings view notification handlers
+    //
     
     func handleSettingsUpdated() {
         println("View told settings have updated")
         self.setTheme()
         
         if config.boolForKey("useAutoTheme") == true {
-            // we know this changed from false to true
-            self.setupAutoTheme()
+            println("  Use Auto Theme: true")
+            if self.captureSession == nil {
+                // only if we have a nil session to we need to start
+                println("  Auto theme not running - starting")
+                self.setupAutoTheme()
+            }
         } else {
-            self.captureTimer?.invalidate()
+            println("  Use Auto Theme: false")
+            self.removeImageCaptureTimer()
             self.endCaptureSession()
             self.setupWithoutAutoTheme()
         }
@@ -497,6 +524,7 @@ class OpenerViewController: UIViewController {
         
     }
     
+    ///////////////////////////////////////////////////////////////////////
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
