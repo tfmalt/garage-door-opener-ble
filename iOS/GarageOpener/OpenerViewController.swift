@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  OpenerViewController.swift
 //  GarageOpener
 //
 //  Created by Thomas Malt on 10/01/15.
@@ -35,6 +35,8 @@ class OpenerViewController: UIViewController {
     var imageOutput    : AVCaptureStillImageOutput!
     var sessionQueue   : dispatch_queue_t!
     
+    var notAuthorizedAlert : UIAlertController?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,11 +53,75 @@ class OpenerViewController: UIViewController {
         self.registerObservers()
         self.setTheme()
         
+        if self.isCaptureDeviceAuthorized() == false {
+            if config.boolForKey("useAutoTheme") == true {
+                self.notAuthorizedAlert = UIAlertController(
+                    title: "Theme Switching Disabled",
+                    message: "Camera access for this app has been removed. " +
+                        "Because of this theme switching has been disabled.\n\n" +
+                        "To be able to switch themes automatically the camera is needed to " +
+                        "measure light levels.\n\n" +
+                        "If you wish to use this feature, please go to the " +
+                        "iOS Settings for Garage Opener to " +
+                        "enable access to the camera.",
+                    preferredStyle: UIAlertControllerStyle.Alert
+                )
+                println("  Disabled use Auto Theme")
+                config.setBool(false, forKey: "useAutoTheme")
+            }
+        }
+        
         if (config.boolForKey("useAutoTheme") == true) {
             self.setupAutoTheme()
         } else {
             self.setupWithoutAutoTheme()
         }
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        println("View did appear!")
+        
+        if let alert = self.notAuthorizedAlert {
+            alert.addAction(
+                UIAlertAction(
+                    title: "OK",
+                    style: UIAlertActionStyle.Default,
+                    handler: { (action: UIAlertAction!) -> Void in
+                        self.notAuthorizedAlert = nil
+                    }
+                )
+            )
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func isCaptureDeviceAuthorized() -> Bool {
+        var status : Bool = false
+        
+        println("Checking authorization status:")
+        switch (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
+        case AVAuthorizationStatus.Authorized:
+            println("  Authorized")
+            status = true
+            break
+        case AVAuthorizationStatus.Denied:
+            println("  Denied")
+            status = false
+            break
+        case AVAuthorizationStatus.NotDetermined:
+            println("  Not Determined")
+            status = false
+            break
+        case AVAuthorizationStatus.Restricted:
+            // privacy settings
+            status = false
+            println("  Restricted")
+        default:
+            println("  Something else - shoudn't happen.")
+            break
+        }
+
+        return status
     }
     
     
@@ -233,6 +299,8 @@ class OpenerViewController: UIViewController {
                 println("  Found running timer - invalidating")
                 timer.invalidate()
             }
+        } else {
+            println("  No timer found.")
         }
         
         self.captureTimer = nil
