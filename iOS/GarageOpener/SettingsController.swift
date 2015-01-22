@@ -87,27 +87,25 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         config.setBool(sender.on, forKey: "showPassword")
     }
     
+    /// Store password and notify main view when done is pressed
     @IBAction func handleDonePressed(sender: AnyObject) {
         config.setObject(passwordField.text, forKey: "password")
         
         self.passwordField.resignFirstResponder()
         self.dismissViewControllerAnimated(true, completion: nil)
         
-        println("modal closed: \(passwordField.text)")
-        
         nc.postNotificationName("settingsUpdated", object: config)
-        
     }
     
+    
+    /// Post notification to main view when cancel is pressed
     @IBAction func handleCancelPressed(sender: AnyObject) {
         self.dismissViewControllerAnimated(true, completion: nil)
-        println("modal closed")
+        self.passwordField.resignFirstResponder()
         
+        nc.postNotificationName("settingsNotUpdated", object: config)
     }
     
-    func modalClosed() -> Void {
-    }
-
     
     /// Iterating over the sections in the table view to update the 
     /// appearance by changing font and case to make it look more like the
@@ -143,6 +141,9 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         return header
     }
     
+    
+    /// Iterates over the tableview sections and updates all the footers
+    /// to look nice
     override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         let footer = UIView(frame: CGRectMake(0, 0, tableView.frame.size.width, 40));
         footer.backgroundColor = UIColor.colorWithHex("#EEEEEE")
@@ -159,6 +160,8 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
     }
     
     
+    /// Helper function to draw a bottom border on the top header for 
+    /// beautiful effect
     func getBottomBorder() -> CALayer {
         let border = CALayer();
         
@@ -168,6 +171,8 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         return border
     }
     
+    
+    /// Helper function to draw the tableview cells the way I want.
     func getLabel() -> UILabel {
         let text = UILabel(
             frame: CGRectMake(18, -4 ,
@@ -180,6 +185,7 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         return text
     }
     
+    /// Makes the textfield disappear
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
