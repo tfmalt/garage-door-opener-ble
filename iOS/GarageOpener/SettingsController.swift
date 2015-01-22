@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import AVFoundation
 
 class SettingsController : UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var passwordField: UITextField!
@@ -57,6 +58,39 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
     
     @IBAction func handleAutoThemeChange(sender: UISwitch) {
         config.setBool(sender.on, forKey: "useAutoTheme")
+        
+        if sender.on == true {
+            self.requestCameraAccess()
+        }
+    }
+    
+    
+    func requestCameraAccess() {
+        AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo, completionHandler: { (access: Bool) -> Void in
+            println("Camera access status: \(access)")
+            var alert = UIAlertController(
+                title: "Theme Switching Disabled",
+                message: "This app does not have access to the camera. " +
+                    "Because of this theme switching has been disabled.\n\n" +
+                    "To be able to switch themes automatically the camera is needed to " +
+                    "measure light levels.\n\n" +
+                    "If you wish to use this feature, please go to the iOS " +
+                    "Settings for Garage Opener to enable access to the camera.",
+                preferredStyle: UIAlertControllerStyle.Alert
+            )
+            alert.addAction(UIAlertAction(
+                title: "OK",
+                style: UIAlertActionStyle.Default,
+                handler: nil
+            ))
+            
+            if access == false {
+                self.presentViewController(alert, animated: true, completion: { () -> Void in
+                    self.config.setBool(false, forKey: "useAutoTheme")
+                    self.themeAutoSwitch.setOn(false, animated: false)
+                })
+            }
+        })
     }
     
     @IBAction func handleShowPasswordChange(sender: UISwitch) {
