@@ -1,29 +1,33 @@
 
 # Garage Opener
 
-An iOS Swift to arduino Bluetooth LE experiment.
+An iOS Swift and Arduino Bluetooth LE experiment.
 See project homepage at http://tfmalt.github.io/garage-door-opener-ble/
 
 This is a hobby experiment to learn swift and in the same go create a 
 remote control for my garage door using an arduino uno.
 
-The remote works awesomely well and connects automatically to the app whenever
-they are in range of one another. 
+The remote works awesomely well, and the app connects automatically to 
+the Arduino controller whenever they are in range of one another. 
 
-If you find it interesting or potentially useful, feel free to contribute or 
-ask for features or functionality.
+If you find it interesting or potentially useful, feel free to 
+contribute or ask for features or functionality.
+
 ## iOS App
 <img style="border: 1px solid #aaa" width="240px" src="http://tfmalt.github.io/garage-door-opener-ble/images/ios_scanning.jpg">
 <img style="border: 1px solid #aaa" width="240px" src="http://tfmalt.github.io/garage-door-opener-ble/images/ios_settings.jpg">
 
 ### TODO
+* Refacture into separate capture device controller
+* Alert cleanly when camera access is denied
+* Ask for camera access when toggelig auto theme for the first time
+
+### DONE
+* Add activty indicator when scanning.
 * Stop and start capture device cleanly when:
 * Changing views from settings to main
 * entering or coming back from the background
 * Remember the last theme on startup.
-
-### DONE
-* Add activty indicator when scanning.
 * Implement dark theme for night time
 * Settings interface to toggle preferred theme
 * Test camera light detection algorithm to toggle theme automatically.
