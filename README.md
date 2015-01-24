@@ -18,7 +18,9 @@ contribute or ask for features or functionality.
 <img style="border: 1px solid #aaa" width="240px" src="http://tfmalt.github.io/garage-door-opener-ble/images/ios_settings.jpg">
 
 ### TODO
-* Refacture into separate capture device controller
+* Stop scanning after 30s
+* update colors: green and orange
+* Refactor into separate capture device controller
 * Alert cleanly when camera access is denied
 * Ask for camera access when toggelig auto theme for the first time
 
