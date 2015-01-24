@@ -18,6 +18,7 @@
 		926AE0ED1A630A8000A19238 /* BTConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926AE0EC1A630A8000A19238 /* BTConstants.swift */; };
 		92784C1F1A659E9B00AB46E9 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92784C1E1A659E9B00AB46E9 /* UIColorExtension.swift */; };
 		92784C211A659F3500AB46E9 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92784C201A659F3500AB46E9 /* UIImageExtension.swift */; };
+		92AB03361A73AF7F00D3CCCD /* GOCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AB03351A73AF7F00D3CCCD /* GOCaptureController.swift */; };
 		92EE278B1A6FD63400EA980B /* AVCaptureDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EE278A1A6FD63400EA980B /* AVCaptureDeviceExtension.swift */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +38,7 @@
 		926AE0EC1A630A8000A19238 /* BTConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTConstants.swift; sourceTree = "<group>"; };
 		92784C1E1A659E9B00AB46E9 /* UIColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		92784C201A659F3500AB46E9 /* UIImageExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
+		92AB03351A73AF7F00D3CCCD /* GOCaptureController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GOCaptureController.swift; sourceTree = "<group>"; };
 		92EE278A1A6FD63400EA980B /* AVCaptureDeviceExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVCaptureDeviceExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,6 +86,7 @@
 				92784C1E1A659E9B00AB46E9 /* UIColorExtension.swift */,
 				92784C201A659F3500AB46E9 /* UIImageExtension.swift */,
 				92EE278A1A6FD63400EA980B /* AVCaptureDeviceExtension.swift */,
+				92AB03351A73AF7F00D3CCCD /* GOCaptureController.swift */,
 			);
 			path = GarageOpener;
 			sourceTree = "<group>";
@@ -192,6 +195,7 @@
 				922973C21A65891300C7E9A9 /* BTService.swift in Sources */,
 				926AE0ED1A630A8000A19238 /* BTConstants.swift in Sources */,
 				920E5EBF1A615EAC00B0E5E3 /* AppDelegate.swift in Sources */,
+				92AB03361A73AF7F00D3CCCD /* GOCaptureController.swift in Sources */,
 				92784C1F1A659E9B00AB46E9 /* UIColorExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -10,6 +10,9 @@ import UIKit
 import CoreBluetooth
 import AVFoundation
 
+// Constructing global singleton of this
+var captureCtrl : GOCaptureController?
+
 class OpenerViewController: UIViewController {
     @IBOutlet weak var openButton: UIButton!
     @IBOutlet weak var statusLabel: UILabel!
@@ -53,25 +56,8 @@ class OpenerViewController: UIViewController {
         self.registerObservers()
         self.setTheme()
         
-        if self.isCaptureDeviceAuthorized() == false {
-            if config.boolForKey("useAutoTheme") == true {
-                self.notAuthorizedAlert = UIAlertController(
-                    title: "Theme Switching Disabled",
-                    message: "Camera access for this app has been removed. " +
-                        "Because of this theme switching has been disabled.\n\n" +
-                        "To be able to switch themes automatically the camera is needed to " +
-                        "measure light levels.\n\n" +
-                        "If you wish to use this feature, please go to the " +
-                        "iOS Settings for Garage Opener to " +
-                        "enable access to the camera.",
-                    preferredStyle: UIAlertControllerStyle.Alert
-                )
-                println("  Disabled use Auto Theme")
-                config.setBool(false, forKey: "useAutoTheme")
-            }
-        }
-        
         if (config.boolForKey("useAutoTheme") == true) {
+            captureCtrl = GOCaptureController()
             self.setupAutoTheme()
         } else {
             self.setupWithoutAutoTheme()
@@ -79,8 +65,8 @@ class OpenerViewController: UIViewController {
     }
     
     override func viewDidAppear(animated: Bool) {
-        println("View did appear!")
         
+        if captureCtrl.needToShowCaptureAlert() == true {}
         if let alert = self.notAuthorizedAlert {
             alert.addAction(
                 UIAlertAction(
@@ -96,34 +82,16 @@ class OpenerViewController: UIViewController {
     }
     
     func isCaptureDeviceAuthorized() -> Bool {
-        var status : Bool = false
         
         println("Checking authorization status:")
-        switch (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
-        case AVAuthorizationStatus.Authorized:
-            println("  Authorized")
-            status = true
-            break
-        case AVAuthorizationStatus.Denied:
-            println("  Denied")
-            status = false
-            break
-        case AVAuthorizationStatus.NotDetermined:
-            println("  Not Determined")
-            status = false
-            break
-        case AVAuthorizationStatus.Restricted:
-            // privacy settings
-            status = false
-            println("  Restricted")
-        default:
-            println("  Something else - shoudn't happen.")
-            break
+        var status = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
+        
+        if (status == AVAuthorizationStatus.Authorized) {
+            return true
         }
-
-        return status
+        
+        return false
     }
-    
     
     func setupAutoTheme() {
         ISOLabel.text = "ISO:"
@@ -517,6 +485,13 @@ class OpenerViewController: UIViewController {
             name: "settingsCancelled",
             object: nil
         )
+        
+        nc.addObserver(
+            self,
+            selector: Selector("handleCameraAccessDenined"),
+            name: "CameraAccessDenied",
+            object: nil
+        )
     }
     
     ///////////////////////////////////////////////////////////////////////
@@ -591,6 +566,42 @@ class OpenerViewController: UIViewController {
         println("View told settings was cancelled")
         
     }
+    
+    
+    func handleCameraAccessDenined(notification: NSNotification) {
+        var capture = notification.object as GOCaptureController
+        
+        println("got camera access denied")
+        
+        var alert = UIAlertController(
+            title: "Theme Switching Disabled",
+            message: "Camera access for this app has been removed. " +
+                "Because of this theme switching has been disabled.\n\n" +
+                "To be able to switch themes automatically the camera is needed to " +
+                "measure light levels.\n\n" +
+                "If you wish to use this feature, please go to the " +
+                "iOS Settings for Garage Opener to " +
+                "enable access to the camera.",
+            preferredStyle: UIAlertControllerStyle.Alert
+        )
+        
+        alert.addAction(
+            UIAlertAction(
+                title: "OK",
+                style: UIAlertActionStyle.Default,
+                handler: { (action: UIAlertAction!) -> Void in
+                    self.notAuthorizedAlert = nil
+                }
+            )
+        )
+        
+        // only present view if use auto theme is actually true
+        if self.config.boolForKey("useAutoTheme") == true {
+            self.config.setBool(false, forKey: "useAutoTheme")
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+    }
+    
     
     ///////////////////////////////////////////////////////////////////////
     
