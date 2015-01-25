@@ -361,12 +361,12 @@ class GOOpenerController: UIViewController {
     ///////////////////////////////////////////////////////////////////////
     
     func handleInputImage(notification: NSNotification) {
-        println("View: Got notification about input image: ")
-        
         var info      = notification.userInfo    as [String : AnyObject]
         var luminance = info["luminance"]        as Float
         var time      = info["exposureTimeMsec"] as Int
         var iso       = info["isoValue"]         as Int
+        
+        NSLog("View: Got notification about input image: \(luminance)")
         
         dispatch_async(dispatch_get_main_queue(), {
             self.setAutoTheme(luminance)
