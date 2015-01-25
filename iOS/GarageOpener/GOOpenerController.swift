@@ -321,19 +321,15 @@ class GOOpenerController: UIViewController {
     }
     
     func appWillEnterForeground(notification: NSNotification) {
-        println("App will enter foreground.")
-        
-        if self.config.boolForKey("useAutoTheme") == true {
-            self.initAutoThemeLabels()
-            captureCtrl.initializeCaptureSession()
-        } else {
-            self.setupWithoutAutoTheme()
-        }
+        println("GOOpener: App will enter foreground.")
+        self.checkAndConfigureAutoTheme()
     }
     
     func appDidEnterBackground(notification: NSNotification) {
-        println("View: App did enter background")
+        println("GOOpener: App did enter background")
         self.updateOpenButtonWait()
+        self.captureCtrl.removeImageCaptureTimer()
+        self.captureCtrl.endCaptureSession()
     }
 
     ///////////////////////////////////////////////////////////////////////

@@ -50,22 +50,8 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
         
         nc.addObserver(
             self,
-            selector: "appDidEnterBackground:",
-            name: UIApplicationDidEnterBackgroundNotification,
-            object: nil
-        )
-        
-        nc.addObserver(
-            self,
             selector: "appWillTerminate:",
             name: UIApplicationWillTerminateNotification,
-            object: nil
-        )
-        
-        nc.addObserver(
-            self,
-            selector: "appWillEnterForeground:",
-            name: UIApplicationWillEnterForegroundNotification,
             object: nil
         )
         
@@ -279,7 +265,7 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
     }
 
 
-    private func endCaptureSession() {
+    func endCaptureSession() {
         dispatch_async(self.sessionQueue, {
             if let session = self.captureSession {
                 if session.running == true {
@@ -301,7 +287,7 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
     //
     // Setting up and tearing down the capture timer
     //
-    private func setupImageCaptureTimer() {
+    func setupImageCaptureTimer() {
         println("Told to setup new image capture timer:")
         if (self.captureTimer == nil || self.captureTimer?.valid == false) {
             println("  Starting new capture NSTimer 4.0s")
@@ -316,7 +302,7 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
     }
     
     
-    private func removeImageCaptureTimer() {
+    func removeImageCaptureTimer() {
         println("Told to remove image capture timer.")
         if let timer : NSTimer = self.captureTimer {
             if timer.valid == true {
@@ -421,20 +407,10 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
     }
 
 
-    func appDidEnterBackground(notification: NSNotification) {
-        println("GoCaptureCtrl: App did enter background")
-        self.removeImageCaptureTimer()
-        self.endCaptureSession()
-    }
-    
     func appWillTerminate(notification: NSNotification) {
         println("GOCaptureCtrl: Told app will terminate")
         self.removeImageCaptureTimer()
         self.endCaptureSession()
     }
     
-    func appWillEnterForeground(notification: NSNotification) {
-        println("GOCaptureCtrl: app will enter foreground")
-        self.initializeCaptureSession()
-    }
 }
