@@ -18,12 +18,12 @@ contribute or ask for features or functionality.
 <img style="border: 1px solid #aaa" width="240px" src="http://tfmalt.github.io/garage-door-opener-ble/images/ios_settings.jpg">
 
 ### TODO
-* Try new silent image grab algorithm.
 * Stop scanning after 30s
 * update colors: green and orange
 
 ### DONE
 * Add activty indicator when scanning.
+* Try new silent image grab algorithm. -- successful.
 * Refactor into separate capture device controller
 * Alert cleanly when camera access is denied
 * Ask for camera access when toggelig auto theme for the first time
