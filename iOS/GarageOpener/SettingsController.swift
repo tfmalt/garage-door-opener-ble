@@ -22,6 +22,13 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        nc.addObserver(
+            self,
+            selector: "handleCaptureDeviceNotAuthorized:",
+            name: "GOCaptureDeviceNotAuthorizedNotification",
+            object: nil
+        )
+        
         self.passwordField.delegate = self
         
         tableView.separatorColor = UIColor.colorWithHex("#cccccc")
@@ -117,6 +124,20 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         nc.postNotificationName("SettingsCancelledNotification", object: config)
     }
     
+    
+    func handleCaptureDeviceNotAuthorized(notification: NSNotification) {
+        var captureCtrl = notification.object as GOCaptureController
+        
+        println("Settings: Got notification capture not authorized")
+        if (self.isViewLoaded() && (self.view.window != nil)) {
+            let alert = captureCtrl.getCameraNotAuthorizedAlert()
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+        
+        println("  - Setting auto theme = false")
+        self.config.setBool(false, forKey: "useAutoTheme")
+        
+    }
     
     /// Iterating over the sections in the table view to update the 
     /// appearance by changing font and case to make it look more like the
