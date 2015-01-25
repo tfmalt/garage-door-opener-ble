@@ -19,11 +19,9 @@ class GOCaptureController: NSObject {
     var sessionQueue   : dispatch_queue_t!
     
     var isAuthorized           : Bool = false
-    var needToShowCaptureAlert : Bool = false
     var isSessionConfigured    : Bool = false
     
-    var config = NSUserDefaults.standardUserDefaults()
-    let nc     = NSNotificationCenter.defaultCenter()
+    let nc = NSNotificationCenter.defaultCenter()
     
     /// Constructor
     override init() {
@@ -33,18 +31,8 @@ class GOCaptureController: NSObject {
             "no.malt.GOCaptureController",
             DISPATCH_QUEUE_SERIAL
         )
-        
+
         self.registerObservers()
-        
-        if config.boolForKey("useAutoTheme") == true {
-            println(
-                "GOCaptureController: auto theme = true, " +
-                "trying to initialize."
-            )
-            self.initializeCaptureSession()
-        } else {
-            println("GOCaptureController: auto theme = false - not initializing")
-        }
     }
     
     
@@ -87,6 +75,7 @@ class GOCaptureController: NSObject {
     }
     
     
+    /// Running the initial setup of a new capture session
     func initializeCaptureSession() {
         if self.isCaptureDeviceAuthorized() == true {
             println("  GOCaptureCtrl: Camera is authorized - initializing")
@@ -98,14 +87,13 @@ class GOCaptureController: NSObject {
             self.isSessionConfigured = true
         } else {
             self.isSessionConfigured = false
-            self.needToShowCaptureAlert = true;
+            nc.postNotificationName("GOCaptureDeviceNotAuthorizedNotification", object: self)
         }
     }
     
     
     func handleAlertShown(notification: NSNotification) {
         println("GOCaptureController: alert shown")
-        self.needToShowCaptureAlert = false
     }
     
     
@@ -187,16 +175,7 @@ class GOCaptureController: NSObject {
     }
 
     private func beginCaptureSession() {
-        if self.config.boolForKey("useAutoTheme") == false {
-            println(
-                "GOCaptureController: told to begin session " +
-                "but auto theme = false - returning"
-            )
-            return
-        }
-        
         dispatch_async(self.sessionQueue, {
-            println("Begin Capture Session")
             if let session = self.captureSession {
                 session.startRunning()
                 self.configureCaptureDevice()
@@ -279,7 +258,7 @@ class GOCaptureController: NSObject {
                 timer.invalidate()
             }
         } else {
-            println("  No timer found.")
+            println("  No timer found - aborting.")
         }
         
         self.captureTimer = nil
@@ -319,16 +298,28 @@ class GOCaptureController: NSObject {
                 return
             }
             
-            var imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer)
-            var image     = UIImage(data: imageData)!
-            var luminance : CGFloat = image.luminance()
+            var image = UIImage(
+                data: AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer)
+            )!
             
-            self.nc.postNotificationName(
-                "CaptureImageNotification",
-                object: image,
-                userInfo: ["luminance": luminance]
-            )
             
+            if let camera = self.captureDevice {
+                var luminance = Float(image.luminance())
+                var time      = Int(round(CMTimeGetSeconds(camera.exposureDuration) * 1000))
+                var iso       = Int(camera.ISO)
+                
+                self.nc.postNotificationName(
+                    "CaptureImageNotification",
+                    object: image,
+                    userInfo: [
+                        "luminance"        : luminance,
+                        "exposureTimeMsec" : time,
+                        "isoValue"         : iso
+                    ]
+                )
+            } else {
+                println("GOCaptureCtrl: Could not get camera after capture - error")
+            }
         })
     }
     
@@ -360,47 +351,40 @@ class GOCaptureController: NSObject {
     
     func handleSettingsUpdated(notification: NSNotification) {
         println("GOCaptureController: Told settings have updated")
+        let config = notification.object as NSUserDefaults
         
-        if config.boolForKey("useAutoTheme") == true {
-            if self.isCaptureDeviceAuthorized() == true {
-                if self.isSessionConfigured == false {
-                    println("  GOCaptureController: initializing session")
-                    self.initializeCaptureSession()
-                } else {
-                    println("  GOCaptureController: told auto theme is on - but session already running")
-                }
-            } else {
-                println("  GOCaptureController: auto theme == true, but camera not authorized - error")
-            }
-        } else {
+        if config.boolForKey("useAutoTheme") == false {
             println("  GOCaptureController: auto theme = false, disabling.")
             self.removeImageCaptureTimer()
             self.endCaptureSession()
+            
+            return
         }
+        
+        if self.isSessionConfigured == true {
+            println("  GOCaptureController: auto theme == true, but session already running")
+            return
+        }
+        
+        println("  GOCaptureController: initializing session")
+        self.initializeCaptureSession()
     }
-    
-    
+
+
     func appDidEnterBackground(notification: NSNotification) {
         println("GoCaptureCtrl: App did enter background")
-        if self.config.boolForKey("useAutoTheme") == true {
-            self.removeImageCaptureTimer()
-            self.endCaptureSession()
-        }
+        self.removeImageCaptureTimer()
+        self.endCaptureSession()
     }
     
     func appWillTerminate(notification: NSNotification) {
         println("GOCaptureCtrl: Told app will terminate")
-        if self.isSessionConfigured {
-            self.removeImageCaptureTimer()
-            self.endCaptureSession()
-        }
+        self.removeImageCaptureTimer()
+        self.endCaptureSession()
     }
     
     func appWillEnterForeground(notification: NSNotification) {
         println("GOCaptureCtrl: app will enter foreground")
-        
-        if self.config.boolForKey("useAutoTheme") == true {
-            self.initializeCaptureSession()
-        }
+        self.initializeCaptureSession()
     }
 }
