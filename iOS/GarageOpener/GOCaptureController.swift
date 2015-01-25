@@ -10,13 +10,15 @@ import Foundation
 import UIKit
 import AVFoundation
 
-class GOCaptureController: NSObject {
+class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     var captureSession : AVCaptureSession?
     var captureDevice  : AVCaptureDevice?
     var captureTimer   : NSTimer?
-    var imageOutput    : AVCaptureStillImageOutput!
+    var videoOutput    : AVCaptureVideoDataOutput!
     var sessionQueue   : dispatch_queue_t!
+    
+    var cameraImage    : UIImage?
     
     var isAuthorized           : Bool?
     var isSessionConfigured    : Bool = false
@@ -36,15 +38,9 @@ class GOCaptureController: NSObject {
     }
     
     
-    /// All the notifications observers we have use for
+    /// Registering all the notifications observers we have use for
+    /// in one place
     private func registerObservers() {
-        nc.addObserver(
-            self,
-            selector: "handleAlertShown:",
-            name: "CameraNotAuthorizedAlertShownNotification",
-            object: nil
-        )
-        
         nc.addObserver(
             self,
             selector: "handleSettingsUpdated:",
@@ -82,6 +78,11 @@ class GOCaptureController: NSObject {
     }
     
     
+    ///////////////////////////////////////////////////////////////////////
+    // 
+    //  handlers to handle initial reqeuest for camera access
+    //
+    
     func handleSettingsRequestCameraAccess(notification: NSNotification) {
         var config = notification.object as NSUserDefaults
         
@@ -108,6 +109,10 @@ class GOCaptureController: NSObject {
         )
     }
     
+    ///////////////////////////////////////////////////////////////////////
+    // 
+    // Functions related to Initializing the capture session 
+    //
     
     /// Running the initial setup of a new capture session
     func initializeCaptureSession() {
@@ -134,39 +139,44 @@ class GOCaptureController: NSObject {
             println("GOCaptureCtrl: Authorization not yet decided.")
         }
     }
-    
-    
-    func handleAlertShown(notification: NSNotification) {
-        println("GOCaptureController: alert shown")
-    }
-    
-    
-    func isCaptureDeviceAuthorized() -> Bool? {
-        println("GOCaptureCtrl: Checking authorization status:")
-        var status = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
-        
-        if (status == AVAuthorizationStatus.Authorized) {
-            self.isAuthorized = true
-        } else if (status == AVAuthorizationStatus.NotDetermined) {
-            self.isAuthorized = nil
-        } else {
-            self.isAuthorized = false
-        }
-        
-        return self.isAuthorized
-    }
-    
+
     
     // beginning the capture session.
     private func setupCaptureSession() {
         self.captureSession             = AVCaptureSession()
-        self.imageOutput                = AVCaptureStillImageOutput()
-        self.imageOutput.outputSettings = [AVVideoCodecKey : AVVideoCodecJPEG]
         self.captureDevice              = AVCaptureDevice.deviceWithVideoInFront()
+        self.videoOutput                = AVCaptureVideoDataOutput()
         
         self.setCaptureSessionPreset(AVCaptureSessionPreset352x288)
         self.addCaptureSessionInputDevice()
         self.addCaptureSessionOutputDevice()
+        
+        self.videoOutput.alwaysDiscardsLateVideoFrames = true
+        self.videoOutput.setSampleBufferDelegate(self, queue: self.sessionQueue)
+        self.videoOutput.videoSettings = [
+            kCVPixelBufferPixelFormatTypeKey: NSNumber(integer: kCVPixelFormatType_32BGRA)
+        ]
+    }
+    
+    /// Implementation of the capture output delegate function
+    func captureOutput(captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
+        
+        var imageBuffer : CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
+        
+        CVPixelBufferLockBaseAddress(imageBuffer, 0)
+        let baseAddress = CVPixelBufferGetBaseAddress(imageBuffer)
+        let bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer)
+        let width       = CVPixelBufferGetWidth(imageBuffer)
+        let height      = CVPixelBufferGetHeight(imageBuffer)
+        
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGBitmapInfo(CGImageAlphaInfo.PremultipliedLast.rawValue)
+        let context    = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, bitmapInfo)
+        let newImage   = CGBitmapContextCreateImage(context)
+        
+        self.cameraImage = UIImage(CGImage: newImage)
+        
+        // NSLog("captureOutput: sample buffer: \(bytesPerRow) w:\(width), h: \(height)")
     }
     
     
@@ -210,8 +220,8 @@ class GOCaptureController: NSObject {
         dispatch_async(self.sessionQueue, {
             println("Adding output device:")
             if let session = self.captureSession {
-                if session.canAddOutput(self.imageOutput) {
-                    session.addOutput(self.imageOutput)
+                if session.canAddOutput(self.videoOutput) {
+                    session.addOutput(self.videoOutput)
                     println("  Added output object as output")
                 } else {
                     println("  Could not add output object -> figure out why")
@@ -219,6 +229,45 @@ class GOCaptureController: NSObject {
             }
         })
     }
+    
+    
+    /// Configuring the actual camera settings for the capture device.
+    private func configureCaptureDevice() {
+        
+        let ISO            = 800.0
+        let exposureLength = (10.0/1000.0)
+        
+        // Paranoid about the precense of a forward facing camera
+        if let camera : AVCaptureDevice = self.captureDevice {
+            camera.lockForConfiguration(nil)
+            println("Locking device configuration")
+            
+            // set framerate
+            camera.activeVideoMinFrameDuration = CMTimeMake(1, 1)
+            camera.activeVideoMaxFrameDuration = CMTimeMake(1, 1)
+            
+            // Set exposure
+            if camera.isExposureModeSupported(AVCaptureExposureMode.Custom) {
+                println("  Setting exposure mode")
+                camera.exposureMode = AVCaptureExposureMode.Custom
+                camera.setExposureModeCustomWithDuration(
+                    CMTimeMakeWithSeconds(exposureLength, 1000*1000*1000),
+                    ISO: Float(ISO),
+                    completionHandler: { (time) -> Void in
+                        println("  - Set custom exposure done.")
+                        self.getLuminance()
+                    }
+                )
+            } else {
+                println("  Camera not supporting custom exposure mode.")
+            }
+            
+            camera.unlockForConfiguration()
+            println("Unlocked device configuration")
+            
+        }
+    }
+
 
     private func beginCaptureSession() {
         dispatch_async(self.sessionQueue, {
@@ -240,55 +289,26 @@ class GOCaptureController: NSObject {
             }
             
             self.captureSession = nil
-            self.imageOutput    = nil
+            self.videoOutput    = nil
             self.captureDevice  = nil
             
             self.isSessionConfigured = false
         })
     }
     
-
-    /// Configuring the actual camera settings for the capture device.
-    private func configureCaptureDevice() {
-        
-        let ISO            = 800.0
-        let exposureLength = (10.0/1000.0)
-        
-        // Paranoid about the precense of a forward facing camera
-        if let camera : AVCaptureDevice = self.captureDevice {
-            camera.lockForConfiguration(nil)
-            println("Locking device configuration")
-            
-            if camera.isExposureModeSupported(AVCaptureExposureMode.Custom) {
-                println("  Setting exposure mode")
-                camera.exposureMode = AVCaptureExposureMode.Custom
-                camera.setExposureModeCustomWithDuration(
-                    CMTimeMakeWithSeconds(exposureLength, 1000*1000*1000),
-                    ISO: Float(ISO),
-                    completionHandler: { (time) -> Void in
-                        println("  - Set custom exposure done.")
-                        self.takePicture()
-                    }
-                )
-            } else {
-                println("  Camera not supporting custom exposure mode.")
-            }
-            
-            camera.unlockForConfiguration()
-            println("Unlocked device configuration")
-            
-        }
-    }
-
     
+    ///////////////////////////////////////////////////////////////////////
+    //
+    // Setting up and tearing down the capture timer
+    //
     private func setupImageCaptureTimer() {
         println("Told to setup new image capture timer:")
         if (self.captureTimer == nil || self.captureTimer?.valid == false) {
             println("  Starting new capture NSTimer 4.0s")
             self.captureTimer = NSTimer.scheduledTimerWithTimeInterval(
-                4.0,
+                2.0,
                 target: self,
-                selector: "takePicture",
+                selector: "getLuminance",
                 userInfo: nil,
                 repeats: true
             )
@@ -311,46 +331,14 @@ class GOCaptureController: NSObject {
     }
 
     
-    
-    func takePicture() {
-        // println("GOCaptureCtrl: taking a picture:")
-        if let session = self.captureSession {
-            if session.running == false {
-                println("GOCaptureCtrl.takePicture: Session.running = false - error - returning.")
-                return
-            }
-    
-            if let connection = self.imageOutput.connectionWithMediaType(AVMediaTypeVideo) {
-                if connection.active == false {
-                    println("GOCaptureCtrl.takePicture - connection.active = false - error - returning.")
-                    return
-                }
-                
-                // println("  Connection active - doing capture")
-                self.imageOutput.captureStillImageAsynchronouslyFromConnection(
-                    self.imageOutput.connectionWithMediaType(AVMediaTypeVideo),
-                    completionHandler: self.handleInputImage
-                )
-            }
-        }
-    }
-
-
-    /// Does the actual handling of the image
-    private func handleInputImage(buffer: CMSampleBuffer!, error: NSError!) {
+    ///////////////////////////////////////////////////////////////////////
+    func getLuminance() {
         dispatch_async(self.sessionQueue, {
-            if (buffer == nil) {
-                println("Got empty image buffer - an error")
-                return
-            }
-            
-            var image = UIImage(
-                data: AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer)
-            )!
-            
+            var image     = self.cameraImage! as UIImage
+            var lumRaw    = image.luminance()
+            var luminance = Float(lumRaw)
             
             if let camera = self.captureDevice {
-                var luminance = Float(image.luminance())
                 var time      = Int(round(CMTimeGetSeconds(camera.exposureDuration) * 1000))
                 var iso       = Int(camera.ISO)
                 
@@ -367,6 +355,22 @@ class GOCaptureController: NSObject {
                 println("GOCaptureCtrl: Could not get camera after capture - error")
             }
         })
+    }
+
+    
+    func isCaptureDeviceAuthorized() -> Bool? {
+        println("GOCaptureCtrl: Checking authorization status:")
+        var status = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
+        
+        if (status == AVAuthorizationStatus.Authorized) {
+            self.isAuthorized = true
+        } else if (status == AVAuthorizationStatus.NotDetermined) {
+            self.isAuthorized = nil
+        } else {
+            self.isAuthorized = false
+        }
+        
+        return self.isAuthorized
     }
     
     

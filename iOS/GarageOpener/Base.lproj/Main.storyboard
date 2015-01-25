@@ -8,7 +8,7 @@
         <!--Garage Opener-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="OpenerViewController" customModule="Garage_Opener" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="GOOpenerController" customModule="Garage_Opener" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -180,10 +180,10 @@
             </objects>
             <point key="canvasLocation" x="567" y="467"/>
         </scene>
-        <!--Preferences-->
+        <!--Settings-->
         <scene sceneID="mAg-Ug-04H">
             <objects>
-                <tableViewController id="V3F-zP-6mv" customClass="SettingsController" customModule="Garage_Opener" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="V3F-zP-6mv" customClass="GOSettingsController" customModule="Garage_Opener" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="RTu-Na-2dx">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -337,7 +337,7 @@
                             <outlet property="delegate" destination="V3F-zP-6mv" id="oBV-jv-1nw"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Preferences" id="RmG-wK-lp5">
+                    <navigationItem key="navigationItem" title="Settings" id="RmG-wK-lp5">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="N4F-te-GZ9">
                             <connections>
                                 <action selector="handleCancelPressed:" destination="V3F-zP-6mv" id="qcM-lf-dCZ"/>
