@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		920E5EBF1A615EAC00B0E5E3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920E5EBE1A615EAC00B0E5E3 /* AppDelegate.swift */; };
-		920E5EC11A615EAC00B0E5E3 /* OpenerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920E5EC01A615EAC00B0E5E3 /* OpenerViewController.swift */; };
+		920E5EC11A615EAC00B0E5E3 /* GOOpenerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920E5EC01A615EAC00B0E5E3 /* GOOpenerController.swift */; };
 		920E5EC61A615EAC00B0E5E3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC51A615EAC00B0E5E3 /* Images.xcassets */; };
 		920E5EC91A615EAC00B0E5E3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 920E5EC71A615EAC00B0E5E3 /* LaunchScreen.xib */; };
 		9224EB241A688CBC00981CBE /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9224EB231A688CBC00981CBE /* SettingsController.swift */; };
@@ -26,7 +26,7 @@
 		920E5EB91A615EAC00B0E5E3 /* Garage Opener.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Garage Opener.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		920E5EBD1A615EAC00B0E5E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		920E5EBE1A615EAC00B0E5E3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		920E5EC01A615EAC00B0E5E3 /* OpenerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenerViewController.swift; sourceTree = "<group>"; };
+		920E5EC01A615EAC00B0E5E3 /* GOOpenerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GOOpenerController.swift; sourceTree = "<group>"; };
 		920E5EC31A615EAC00B0E5E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		920E5EC51A615EAC00B0E5E3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		920E5EC81A615EAC00B0E5E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -74,7 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				920E5EBE1A615EAC00B0E5E3 /* AppDelegate.swift */,
-				920E5EC01A615EAC00B0E5E3 /* OpenerViewController.swift */,
+				920E5EC01A615EAC00B0E5E3 /* GOOpenerController.swift */,
 				920E5EC21A615EAC00B0E5E3 /* Main.storyboard */,
 				9224EB231A688CBC00981CBE /* SettingsController.swift */,
 				920E5EC51A615EAC00B0E5E3 /* Images.xcassets */,
@@ -188,7 +188,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9224EB241A688CBC00981CBE /* SettingsController.swift in Sources */,
-				920E5EC11A615EAC00B0E5E3 /* OpenerViewController.swift in Sources */,
+				920E5EC11A615EAC00B0E5E3 /* GOOpenerController.swift in Sources */,
 				926AE0E71A61D28600A19238 /* BTDiscoveryManager.swift in Sources */,
 				92EE278B1A6FD63400EA980B /* AVCaptureDeviceExtension.swift in Sources */,
 				92784C211A659F3500AB46E9 /* UIImageExtension.swift in Sources */,
