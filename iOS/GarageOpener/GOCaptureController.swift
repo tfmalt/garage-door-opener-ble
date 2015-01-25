@@ -150,19 +150,19 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
         var imageBuffer : CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
         
         CVPixelBufferLockBaseAddress(imageBuffer, 0)
+        
         let baseAddress = CVPixelBufferGetBaseAddress(imageBuffer)
         let bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer)
         let width       = CVPixelBufferGetWidth(imageBuffer)
         let height      = CVPixelBufferGetHeight(imageBuffer)
+        let colorSpace  = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo  = CGBitmapInfo(CGImageAlphaInfo.PremultipliedLast.rawValue)
+        let context     = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, bitmapInfo)
+        let newImage    = CGBitmapContextCreateImage(context)
         
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGBitmapInfo(CGImageAlphaInfo.PremultipliedLast.rawValue)
-        let context    = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, bitmapInfo)
-        let newImage   = CGBitmapContextCreateImage(context)
+        CVPixelBufferUnlockBaseAddress(imageBuffer, 0)
         
         self.cameraImage = UIImage(CGImage: newImage)
-        
-        // NSLog("captureOutput: sample buffer: \(bytesPerRow) w:\(width), h: \(height)")
     }
     
     
@@ -253,6 +253,21 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
             
         }
     }
+    
+    
+    func getLuminance() {
+        dispatch_async(self.sessionQueue, {
+            var image     = self.cameraImage! as UIImage
+            var luminance = Float(image.luminance())
+            
+            self.nc.postNotificationName(
+                "GOCaptureCalculatedLightLevelNotification",
+                object: image,
+                userInfo: ["luminance": luminance]
+            )
+        })
+    }
+
 
 
     private func beginCaptureSession() {
@@ -318,31 +333,7 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
 
     
     ///////////////////////////////////////////////////////////////////////
-    func getLuminance() {
-        dispatch_async(self.sessionQueue, {
-            var image     = self.cameraImage! as UIImage
-            var lumRaw    = image.luminance()
-            var luminance = Float(lumRaw)
-            
-            if let camera = self.captureDevice {
-                var time      = Int(round(CMTimeGetSeconds(camera.exposureDuration) * 1000))
-                var iso       = Int(camera.ISO)
-                
-                self.nc.postNotificationName(
-                    "CaptureImageNotification",
-                    object: image,
-                    userInfo: [
-                        "luminance"        : luminance,
-                        "exposureTimeMsec" : time,
-                        "isoValue"         : iso
-                    ]
-                )
-            } else {
-                println("GOCaptureCtrl: Could not get camera after capture - error")
-            }
-        })
-    }
-
+    
     
     func isCaptureDeviceAuthorized() -> Bool? {
         println("GOCaptureCtrl: Checking authorization status:")

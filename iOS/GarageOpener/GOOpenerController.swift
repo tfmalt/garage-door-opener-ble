@@ -18,11 +18,7 @@ class GOOpenerController: UIViewController {
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var rssiLabel: UILabel!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var ISOValueLabel: UILabel!
-    @IBOutlet weak var expValueLabel: UILabel!
     @IBOutlet weak var lumValueLabel: UILabel!
-    @IBOutlet weak var ISOLabel: UILabel!
-    @IBOutlet weak var expLabel: UILabel!
     @IBOutlet weak var lumLabel: UILabel!
     
     var discovery   : BTDiscoveryManager?
@@ -67,8 +63,6 @@ class GOOpenerController: UIViewController {
     func initLabels() {
         self.statusLabel.text   = "Initializing";
         self.rssiLabel.text     = self.getConnectionBar(0)
-        self.ISOValueLabel.text = ""
-        self.expValueLabel.text = ""
         self.lumValueLabel.text = ""
     }
     
@@ -110,19 +104,12 @@ class GOOpenerController: UIViewController {
     }
     
     func initAutoThemeLabels() {
-        ISOLabel.text = "ISO:"
-        expLabel.text = "Exp:"
         lumLabel.text = "Lum:"
     }
     
     
     func setupWithoutAutoTheme() {
-        ISOLabel.text = ""
-        expLabel.text = ""
         lumLabel.text = ""
-        
-        ISOValueLabel.text = ""
-        expValueLabel.text = ""
         lumValueLabel.text = ""
     }
     
@@ -143,8 +130,8 @@ class GOOpenerController: UIViewController {
         self.setNeedsStatusBarAppearanceUpdate()
     }
     
-    
-    func setAutoTheme(luminance: Float) {
+    /// Updates the automatic theme settings based on the luminance value
+    func updateAutoTheme(luminance: Float) {
         if self.config.boolForKey("useAutoTheme") == false {
             return
         }
@@ -286,8 +273,8 @@ class GOOpenerController: UIViewController {
         
         nc.addObserver(
             self,
-            selector: "handleInputImage:",
-            name: "CaptureImageNotification",
+            selector: "handleLightLevelUpdate:",
+            name: "GOCaptureCalculatedLightLevelNotification",
             object: nil
         )
         
@@ -356,20 +343,15 @@ class GOOpenerController: UIViewController {
     
     ///////////////////////////////////////////////////////////////////////
     
-    func handleInputImage(notification: NSNotification) {
+    func handleLightLevelUpdate(notification: NSNotification) {
         var info      = notification.userInfo    as [String : AnyObject]
         var luminance = info["luminance"]        as Float
-        var time      = info["exposureTimeMsec"] as Int
-        var iso       = info["isoValue"]         as Int
         
         NSLog("View: Got notification about input image: \(luminance)")
         
         dispatch_async(dispatch_get_main_queue(), {
-            self.setAutoTheme(luminance)
-                
-            self.ISOValueLabel.text = String(iso)
-            self.expValueLabel.text = "\(time)/1000 s"
-            self.lumValueLabel.text = String(format: "%.2f", Float(luminance))
+            self.updateAutoTheme(luminance)
+            self.lumValueLabel.text = String(format: "%.2f", luminance)
         })
     }
     
