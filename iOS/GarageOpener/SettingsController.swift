@@ -19,8 +19,16 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
     var config = NSUserDefaults.standardUserDefaults()
     var nc     = NSNotificationCenter.defaultCenter()
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        nc.addObserver(
+            self,
+            selector: "handleCaptureDeviceNotAuthorized:",
+            name: "GOCaptureDeviceNotAuthorizedNotification",
+            object: nil
+        )
         
         self.passwordField.delegate = self
         
@@ -60,39 +68,14 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         config.setBool(sender.on, forKey: "useAutoTheme")
         
         if sender.on == true {
-            self.requestCameraAccess()
+            nc.postNotificationName(
+                "GOSettingsRequestCameraAccessNotification",
+                object: config
+            )
         }
     }
     
-    
-    func requestCameraAccess() {
-        AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo, completionHandler: { (access: Bool) -> Void in
-            println("Camera access status: \(access)")
-            var alert = UIAlertController(
-                title: "Theme Switching Disabled",
-                message: "This app does not have access to the camera. " +
-                    "Because of this theme switching has been disabled.\n\n" +
-                    "To be able to switch themes automatically the camera is needed to " +
-                    "measure light levels.\n\n" +
-                    "If you wish to use this feature, please go to the iOS " +
-                    "Settings for Garage Opener to enable access to the camera.",
-                preferredStyle: UIAlertControllerStyle.Alert
-            )
-            alert.addAction(UIAlertAction(
-                title: "OK",
-                style: UIAlertActionStyle.Default,
-                handler: nil
-            ))
-            
-            if access == false {
-                self.presentViewController(alert, animated: true, completion: { () -> Void in
-                    self.config.setBool(false, forKey: "useAutoTheme")
-                    self.themeAutoSwitch.setOn(false, animated: false)
-                })
-            }
-        })
-    }
-    
+
     @IBAction func handleShowPasswordChange(sender: UISwitch) {
         passwordField.secureTextEntry = !sender.on
         config.setBool(sender.on, forKey: "showPassword")
@@ -105,7 +88,7 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         self.passwordField.resignFirstResponder()
         self.dismissViewControllerAnimated(true, completion: nil)
         
-        nc.postNotificationName("settingsUpdated", object: config)
+        nc.postNotificationName("SettingsUpdatedNotification", object: config)
     }
     
     
@@ -114,9 +97,26 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         self.dismissViewControllerAnimated(true, completion: nil)
         self.passwordField.resignFirstResponder()
         
-        nc.postNotificationName("settingsCancelled", object: config)
+        nc.postNotificationName("SettingsCancelledNotification", object: config)
     }
     
+    
+    func handleCaptureDeviceNotAuthorized(notification: NSNotification) {
+        var captureCtrl = notification.object as GOCaptureController
+        
+        println("Settings: Got notification capture not authorized")
+        if (self.isViewLoaded() && (self.view.window != nil)) {
+            let alert = captureCtrl.getCameraNotAuthorizedAlert()
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            println("  - Setting auto theme = false")
+            self.config.setBool(false, forKey: "useAutoTheme")
+            self.themeAutoSwitch.on = false
+        })
+        
+    }
     
     /// Iterating over the sections in the table view to update the 
     /// appearance by changing font and case to make it look more like the
