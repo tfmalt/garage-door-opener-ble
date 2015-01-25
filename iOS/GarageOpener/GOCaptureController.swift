@@ -18,7 +18,7 @@ class GOCaptureController: NSObject {
     var imageOutput    : AVCaptureStillImageOutput!
     var sessionQueue   : dispatch_queue_t!
     
-    var isAuthorized           : Bool = false
+    var isAuthorized           : Bool?
     var isSessionConfigured    : Bool = false
     
     let nc = NSNotificationCenter.defaultCenter()
@@ -54,30 +54,67 @@ class GOCaptureController: NSObject {
         
         nc.addObserver(
             self,
-            selector: "appDidEnterBackground",
+            selector: "appDidEnterBackground:",
             name: UIApplicationDidEnterBackgroundNotification,
             object: nil
         )
         
         nc.addObserver(
             self,
-            selector: "appWillTerminate",
+            selector: "appWillTerminate:",
             name: UIApplicationWillTerminateNotification,
             object: nil
         )
         
         nc.addObserver(
             self,
-            selector: "appWillEnterForeground",
+            selector: "appWillEnterForeground:",
             name: UIApplicationWillEnterForegroundNotification,
             object: nil
+        )
+        
+        nc.addObserver(
+            self,
+            selector: "handleSettingsRequestCameraAccess:",
+            name: "GOSettingsRequestCameraAccessNotification",
+            object: nil
+        )
+    }
+    
+    
+    func handleSettingsRequestCameraAccess(notification: NSNotification) {
+        var config = notification.object as NSUserDefaults
+        
+        self.requestCameraAccess(config)
+        
+    }
+    
+    func requestCameraAccess(config: NSUserDefaults) {
+        AVCaptureDevice.requestAccessForMediaType(
+            AVMediaTypeVideo,
+            completionHandler: { (access: Bool) -> Void in
+                if access == true {
+                    self.nc.postNotificationName(
+                        "GOCaptureDeviceAuthorizedNotification",
+                        object: self
+                    )
+                } else {
+                    self.nc.postNotificationName(
+                        "GOCaptureDeviceNotAuthorizedNotification",
+                        object: self
+                    )
+                }
+            }
         )
     }
     
     
     /// Running the initial setup of a new capture session
     func initializeCaptureSession() {
-        if self.isCaptureDeviceAuthorized() == true {
+        
+        var isauth = self.isCaptureDeviceAuthorized()
+        
+        if isauth == true {
             println("  GOCaptureCtrl: Camera is authorized - initializing")
 
             self.setupCaptureSession()
@@ -85,9 +122,16 @@ class GOCaptureController: NSObject {
             self.setupImageCaptureTimer()
             
             self.isSessionConfigured = true
-        } else {
+        } else if (isauth == false) {
             self.isSessionConfigured = false
             nc.postNotificationName("GOCaptureDeviceNotAuthorizedNotification", object: self)
+        } else {
+            nc.postNotificationName(
+                "GOCaptureDeviceAuthorizationNotDetermined",
+                object: self
+            )
+           
+            println("GOCaptureCtrl: Authorization not yet decided.")
         }
     }
     
@@ -97,12 +141,14 @@ class GOCaptureController: NSObject {
     }
     
     
-    func isCaptureDeviceAuthorized() -> Bool {
-        println("Checking authorization status:")
+    func isCaptureDeviceAuthorized() -> Bool? {
+        println("GOCaptureCtrl: Checking authorization status:")
         var status = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
         
         if (status == AVAuthorizationStatus.Authorized) {
             self.isAuthorized = true
+        } else if (status == AVAuthorizationStatus.NotDetermined) {
+            self.isAuthorized = nil
         } else {
             self.isAuthorized = false
         }
@@ -267,20 +313,20 @@ class GOCaptureController: NSObject {
     
     
     func takePicture() {
-        println("GOCaptureCtrl: taking a picture:")
+        // println("GOCaptureCtrl: taking a picture:")
         if let session = self.captureSession {
             if session.running == false {
-                println("  Session.running = false - error - returning.")
+                println("GOCaptureCtrl.takePicture: Session.running = false - error - returning.")
                 return
             }
     
             if let connection = self.imageOutput.connectionWithMediaType(AVMediaTypeVideo) {
                 if connection.active == false {
-                    println("    connection.active = false - error - returning.")
+                    println("GOCaptureCtrl.takePicture - connection.active = false - error - returning.")
                     return
                 }
                 
-                println("  Connection active - doing capture")
+                // println("  Connection active - doing capture")
                 self.imageOutput.captureStillImageAsynchronouslyFromConnection(
                     self.imageOutput.connectionWithMediaType(AVMediaTypeVideo),
                     completionHandler: self.handleInputImage
@@ -327,12 +373,12 @@ class GOCaptureController: NSObject {
     func getCameraNotAuthorizedAlert() -> UIAlertController {
         var alert = UIAlertController(
             title: "Theme Switching Disabled",
-            message: "Camera access for this app has been removed. " +
-                "Because of this theme switching has been disabled.\n\n" +
+            message: "Camera access for this app has been turned off in settings. " +
+                "Because of this theme switching is disabled.\n\n" +
                 "To be able to switch themes automatically the camera is needed to " +
                 "measure light levels.\n\n" +
                 "If you wish to use this feature, please go to the " +
-                "iOS Settings for Garage Opener to " +
+                "iOS Settings for Garage Opener and " +
                 "enable access to the camera.",
             preferredStyle: UIAlertControllerStyle.Alert
         )
