@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import AVFoundation
 
-class SettingsController : UITableViewController, UITextFieldDelegate {
+class GOSettingsController : UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var passwordField: UITextField!
     @IBOutlet weak var showPasswordSwitch: UISwitch!
     @IBOutlet weak var darkThemeSwitch: UISwitch!
