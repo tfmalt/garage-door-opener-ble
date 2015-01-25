@@ -11,7 +11,7 @@ import CoreBluetooth
 import AVFoundation
 
 // Constructing global singleton of this
-let captureCtrl : GOCaptureController = GOCaptureController()
+var captureCtrl : GOCaptureController = GOCaptureController()
 
 class OpenerViewController: UIViewController {
     @IBOutlet weak var openButton: UIButton!
@@ -25,12 +25,14 @@ class OpenerViewController: UIViewController {
     @IBOutlet weak var expLabel: UILabel!
     @IBOutlet weak var lumLabel: UILabel!
     
-    
-    var counter = 0
     var discovery   : BTDiscoveryManager?
+    var captureCtrl : GOCaptureController = GOCaptureController()
     var isConnected : Bool?
-    var nc     = NSNotificationCenter.defaultCenter()
+    
+    var needToShowCameraNotAuthorizedAlert : Bool = false
+    
     var config = NSUserDefaults.standardUserDefaults()
+    let nc     = NSNotificationCenter.defaultCenter()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,10 +47,10 @@ class OpenerViewController: UIViewController {
         self.registerObservers()
         self.setTheme()
         
-        if  (config.boolForKey("useAutoTheme") == true) &&
-            (captureCtrl.isCaptureDeviceAuthorized() == true) {
-            println("View: auto theme true and camera is authorized")
+        if config.boolForKey("useAutoTheme") == true {
+            println("View: auto theme true - trying to init capture.")
             self.initAutoThemeLabels()
+            self.captureCtrl.initializeCaptureSession()
         } else {
             println("View: Auto Theme disabled")
             self.setupWithoutAutoTheme()
@@ -56,36 +58,27 @@ class OpenerViewController: UIViewController {
     }
     
     override func viewDidAppear(animated: Bool) {
-        
-        if captureCtrl.needToShowCaptureAlert == false {
-            return
+        if self.needToShowCameraNotAuthorizedAlert == true {
+            self.showCameraNotAuthorizedAlert()
         }
-        
-        self.showCameraNotAuthorizedAlert()
     }
     
-    
     func showCameraNotAuthorizedAlert() {
-        let alert = captureCtrl.getCameraNotAuthorizedAlert()
+        let alert = self.captureCtrl.getCameraNotAuthorizedAlert()
         self.presentViewController(alert, animated: true, completion: { () -> Void in
-            self.nc.postNotificationName(
-                "CameraNotAuthorizedAlertShownNotification",
-                object: alert
-            )
+            self.needToShowCameraNotAuthorizedAlert = false
         })
     }
     
-    func isCaptureDeviceAuthorized() -> Bool {
-        
-        println("Checking authorization status:")
-        var status = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
-        
-        if (status == AVAuthorizationStatus.Authorized) {
-            return true
+    func handleCaptureDeviceNotAuthorized(notification: NSNotification) {
+        println("View: got notified capture is not authorized.")
+        if (self.isViewLoaded() && (self.view.window != nil)) {
+            self.showCameraNotAuthorizedAlert()
+        } else {
+            self.needToShowCameraNotAuthorizedAlert = true
         }
-        
-        return false
     }
+
     
     func initAutoThemeLabels() {
         ISOLabel.text = "ISO:"
@@ -269,6 +262,13 @@ class OpenerViewController: UIViewController {
             name: "CaptureImageNotification",
             object: nil
         )
+        
+        nc.addObserver(
+            self,
+            selector: "handleCaptureDeviceNotAuthorized:",
+            name: "GOCaptureDeviceNotAuthorizedNotification",
+            object: nil
+        )
     }
     
     ///////////////////////////////////////////////////////////////////////
@@ -330,27 +330,21 @@ class OpenerViewController: UIViewController {
     
     func handleInputImage(notification: NSNotification) {
         println("View: Got notification about input image: ")
-        var info = notification.userInfo as [String : CGFloat]
-        var luminance = Float(info["luminance"]!)
+        
+        var info      = notification.userInfo    as [String : AnyObject]
+        var luminance = info["luminance"]        as Float
+        var time      = info["exposureTimeMsec"] as Int
+        var iso       = info["isoValue"]         as Int
         
         dispatch_async(dispatch_get_main_queue(), {
             self.setAutoTheme(luminance)
-            
-            if let camera = captureCtrl.captureDevice {
-                var duration = CMTimeGetSeconds(camera.exposureDuration) * 1000
-                var time     = Int(round(duration))
-                var iso      = Int(camera.ISO)
                 
-                self.ISOValueLabel.text = String(iso)
-                self.expValueLabel.text = "\(time)/1000 s"
-                self.lumValueLabel.text = String(
-                    format: "%.2f",
-                    Float(luminance)
-                )
-            }
+            self.ISOValueLabel.text = String(iso)
+            self.expValueLabel.text = "\(time)/1000 s"
+            self.lumValueLabel.text = String(format: "%.2f", Float(luminance))
         })
-    
     }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -375,8 +369,6 @@ class OpenerViewController: UIViewController {
     
 
     @IBAction func openButtonPressed(sender: UIButton) {
-        counter = counter + 1;
-        
         let rx = self.getRXCharacteristic()
         if rx == nil { return }
        
