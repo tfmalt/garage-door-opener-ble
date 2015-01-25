@@ -347,8 +347,6 @@ class GOOpenerController: UIViewController {
         var info      = notification.userInfo    as [String : AnyObject]
         var luminance = info["luminance"]        as Float
         
-        NSLog("View: Got notification about input image: \(luminance)")
-        
         dispatch_async(dispatch_get_main_queue(), {
             self.updateAutoTheme(luminance)
             self.lumValueLabel.text = String(format: "%.2f", luminance)
