@@ -11,7 +11,7 @@ import CoreBluetooth
 import AVFoundation
 
 // Constructing global singleton of this
-var captureCtrl : GOCaptureController?
+let captureCtrl : GOCaptureController = GOCaptureController()
 
 class OpenerViewController: UIViewController {
     @IBOutlet weak var openButton: UIButton!
@@ -32,19 +32,8 @@ class OpenerViewController: UIViewController {
     var nc     = NSNotificationCenter.defaultCenter()
     var config = NSUserDefaults.standardUserDefaults()
     
-    var captureSession : AVCaptureSession?
-    var captureDevice  : AVCaptureDevice?
-    var captureTimer   : NSTimer?
-    var imageOutput    : AVCaptureStillImageOutput!
-    var sessionQueue   : dispatch_queue_t!
-    
-    var notAuthorizedAlert : UIAlertController?
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        sessionQueue = dispatch_queue_create("session queue", DISPATCH_QUEUE_SERIAL)
         
         statusLabel.text = "Initializing";
         rssiLabel.text   = self.getConnectionBar(0)
@@ -56,29 +45,34 @@ class OpenerViewController: UIViewController {
         self.registerObservers()
         self.setTheme()
         
-        if (config.boolForKey("useAutoTheme") == true) {
-            captureCtrl = GOCaptureController()
-            self.setupAutoTheme()
+        if  (config.boolForKey("useAutoTheme") == true) &&
+            (captureCtrl.isCaptureDeviceAuthorized() == true) {
+            println("View: auto theme true and camera is authorized")
+            self.initAutoThemeLabels()
         } else {
+            println("View: Auto Theme disabled")
             self.setupWithoutAutoTheme()
         }
     }
     
     override func viewDidAppear(animated: Bool) {
         
-        if captureCtrl.needToShowCaptureAlert() == true {}
-        if let alert = self.notAuthorizedAlert {
-            alert.addAction(
-                UIAlertAction(
-                    title: "OK",
-                    style: UIAlertActionStyle.Default,
-                    handler: { (action: UIAlertAction!) -> Void in
-                        self.notAuthorizedAlert = nil
-                    }
-                )
-            )
-            self.presentViewController(alert, animated: true, completion: nil)
+        if captureCtrl.needToShowCaptureAlert == false {
+            return
         }
+        
+        self.showCameraNotAuthorizedAlert()
+    }
+    
+    
+    func showCameraNotAuthorizedAlert() {
+        let alert = captureCtrl.getCameraNotAuthorizedAlert()
+        self.presentViewController(alert, animated: true, completion: { () -> Void in
+            self.nc.postNotificationName(
+                "CameraNotAuthorizedAlertShownNotification",
+                object: alert
+            )
+        })
     }
     
     func isCaptureDeviceAuthorized() -> Bool {
@@ -93,14 +87,11 @@ class OpenerViewController: UIViewController {
         return false
     }
     
-    func setupAutoTheme() {
+    func initAutoThemeLabels() {
         ISOLabel.text = "ISO:"
         expLabel.text = "Exp:"
         lumLabel.text = "Lum:"
         
-        self.setupCaptureSession()
-        self.beginCaptureSession()
-        self.setupImageCaptureTimer()
     }
     
     
@@ -112,213 +103,6 @@ class OpenerViewController: UIViewController {
         ISOValueLabel.text = ""
         expValueLabel.text = ""
         lumValueLabel.text = ""
-    }
-    
-
-    ///////////////////////////////////////////////////////////////////////
-    //
-    //  Setting up the capture session and dealing with functionality
-    //  relating to automatic theme change
-    //
-    
-    func setCaptureSessionPreset(preset: NSString!) {
-        dispatch_async(self.sessionQueue, {
-            println("Set capture session preset:")
-            if let session = self.captureSession {
-                if session.canSetSessionPreset(preset) {
-                    session.sessionPreset = preset
-                    println("  Set capture preset to: \(preset)")
-                } else {
-                    println("  Could not set preset: \(preset) -> implement fallback")
-                }
-            }
-        })
-    }
-    
-    
-    func addCaptureSessionInputDevice() {
-        dispatch_async(self.sessionQueue, {
-            println("Adding input device:")
-            if let session = self.captureSession {
-                if let camera = self.captureDevice {
-                    var input  = AVCaptureDeviceInput(device: camera, error: nil)
-                    
-                    if session.canAddInput(input) {
-                        session.addInput(AVCaptureDeviceInput(device: camera, error: nil))
-                        println("  Added front camera as input")
-                    } else {
-                        println("  Could not add front camera as input")
-                    }
-                    
-                    println("  active format: \(camera.activeFormat.description)")
-                }
-            }
-        })
-    }
-    
-    
-    func addCaptureSessionOutputDevice() {
-        dispatch_async(self.sessionQueue, {
-            println("Adding output device:")
-            if let session = self.captureSession {
-                if session.canAddOutput(self.imageOutput) {
-                    session.addOutput(self.imageOutput)
-                    println("  Added output object as output")
-                } else {
-                    println("  Could not add output object -> figure out why")
-                }
-            }
-        })
-    }
-    
-    
-    // beginning the capture session.
-    func setupCaptureSession() {
-        self.captureSession             = AVCaptureSession()
-        self.imageOutput                = AVCaptureStillImageOutput()
-        self.imageOutput.outputSettings = [AVVideoCodecKey : AVVideoCodecJPEG]
-        self.captureDevice              = AVCaptureDevice.deviceWithVideoInFront()
-        
-        self.setCaptureSessionPreset(AVCaptureSessionPreset352x288)
-        self.addCaptureSessionInputDevice()
-        self.addCaptureSessionOutputDevice()
-    }
-    
-    
-    func beginCaptureSession() {
-        if self.config.boolForKey("useAutoTheme") == true {
-            dispatch_async(self.sessionQueue, {
-                println("Begin Capture Session")
-                if let session = self.captureSession {
-                    session.startRunning()
-                    self.configureCaptureDevice()
-                }
-            })
-        }
-    }
-    
-    
-    func endCaptureSession() {
-        dispatch_async(self.sessionQueue, {
-            if let session = self.captureSession {
-                if session.running == true {
-                    println("Stopping capture session")
-                    session.stopRunning()
-                }
-            }
-            
-            self.captureSession = nil
-            self.imageOutput    = nil
-            self.captureDevice  = nil
-        })
-    }
-    
-    
-    func configureCaptureDevice() {
-        
-        let ISO            = 800.0
-        let exposureLength = (10.0/1000.0)
-        
-        // Paranoid about the precense of a forward facing camera
-        if let camera : AVCaptureDevice = self.captureDevice {
-            camera.lockForConfiguration(nil)
-            println("Locking device configuration")
-            
-            if camera.isExposureModeSupported(AVCaptureExposureMode.Custom) {
-                println("  Setting exposure mode")
-                camera.exposureMode = AVCaptureExposureMode.Custom
-                camera.setExposureModeCustomWithDuration(
-                    CMTimeMakeWithSeconds(exposureLength, 1000*1000*1000),
-                    ISO: Float(ISO),
-                    completionHandler: { (time) -> Void in
-                        println("  - Set custom exposure done.")
-                        self.doActualCapture()
-                    }
-                )
-            } else {
-                println("  Camera not supporting custom exposure mode.")
-            }
-            
-            camera.unlockForConfiguration()
-            println("Unlocked device configuration")
-        }
-        
-    }
-    
-    
-    func setupImageCaptureTimer() {
-        println("Told to setup new image capture timer:")
-        if (self.captureTimer == nil || self.captureTimer?.valid == false) {
-            println("  Starting new capture NSTimer 4.0s")
-            self.captureTimer = NSTimer.scheduledTimerWithTimeInterval(
-                4.0,
-                target: self,
-                selector: "doActualCapture",
-                userInfo: nil,
-                repeats: true
-            )
-        }
-    }
-    
-    func removeImageCaptureTimer() {
-        println("Told to remove image capture timer.")
-        if let timer : NSTimer = self.captureTimer {
-            if timer.valid == true {
-                println("  Found running timer - invalidating")
-                timer.invalidate()
-            }
-        } else {
-            println("  No timer found.")
-        }
-        
-        self.captureTimer = nil
-    }
-    
-    
-    func doActualCapture() {
-        println("Do actual capture called:")
-        if let session = self.captureSession {
-            if session.running == true {
-                println("  Session running")
-                if let connection = self.imageOutput.connectionWithMediaType(AVMediaTypeVideo) {
-                    println("    Got connection")
-                    if connection.active == true {
-                        println("      Connection active - doing capture")
-                        self.imageOutput.captureStillImageAsynchronouslyFromConnection(
-                            self.imageOutput.connectionWithMediaType(AVMediaTypeVideo),
-                            completionHandler: self.handleInputImage
-                        )
-                    }
-                }
-            }
-        }
-    }
-    
-    
-    /// Does the actual handling of the image
-    func handleInputImage(buffer: CMSampleBuffer!, error: NSError!) {
-        dispatch_async(dispatch_get_main_queue(), {
-            if (buffer == nil) {
-                println("Got empty image buffer - an error")
-                return
-            }
-            
-            var imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer)
-            var image     = UIImage(data: imageData)!
-            var luminance = image.luminance()
-            
-            self.setAutoTheme(luminance)
-            
-            if let camera = self.captureDevice {
-                var duration = CMTimeGetSeconds(camera.exposureDuration) * 1000
-                var time     = Int(round(duration))
-                var iso      = Int(camera.ISO)
-                
-                self.ISOValueLabel.text = String(iso)
-                self.expValueLabel.text = "\(time)/1000 s"
-                self.lumValueLabel.text = String(format: "%.2f", Float(luminance))
-            }
-        })
     }
     
     
@@ -339,15 +123,15 @@ class OpenerViewController: UIViewController {
     }
     
     
-    func setAutoTheme(luminance: CGFloat) {
+    func setAutoTheme(luminance: Float) {
         if self.config.boolForKey("useAutoTheme") == false {
             return
         }
         
-        if (luminance >= 0.5) {
+        if (luminance >= 0.50) {
             self.setLightThemeAnimated()
         }
-        else if (luminance < 0.5) {
+        else if (luminance <= 0.40) {
             self.setDarkThemeAnimated()
         }
         
@@ -418,13 +202,6 @@ class OpenerViewController: UIViewController {
         
         nc.addObserver(
             self,
-            selector: Selector("appWillTerminate:"),
-            name: UIApplicationWillTerminateNotification,
-            object: nil
-        )
-        
-        nc.addObserver(
-            self,
             selector: Selector("appWillEnterForeground:"),
             name: UIApplicationWillEnterForegroundNotification,
             object: nil
@@ -474,22 +251,22 @@ class OpenerViewController: UIViewController {
         
         nc.addObserver(
             self,
-            selector: Selector("handleSettingsUpdated"),
-            name: "settingsUpdated",
+            selector: "handleSettingsUpdated",
+            name: "SettingsUpdatedNotification",
             object: nil
         )
         
         nc.addObserver(
             self,
             selector: Selector("handleSettingsCancelled"),
-            name: "settingsCancelled",
+            name: "SettingsCancelledNotification",
             object: nil
         )
         
         nc.addObserver(
             self,
-            selector: Selector("handleCameraAccessDenined"),
-            name: "CameraAccessDenied",
+            selector: "handleInputImage:",
+            name: "CaptureImageNotification",
             object: nil
         )
     }
@@ -508,33 +285,20 @@ class OpenerViewController: UIViewController {
         println("App did become active")
     }
     
-    
-    func appWillTerminate(notification: NSNotification) {
-        println("App will terminate")
-        
-        if self.config.boolForKey("useAutoTheme") == true {
-            self.endCaptureSession()
-        }
-    }
-    
     func appWillEnterForeground(notification: NSNotification) {
         println("App will enter foreground.")
         
         if self.config.boolForKey("useAutoTheme") == true {
-            self.setupAutoTheme()
+            self.initAutoThemeLabels()
+            captureCtrl.initializeCaptureSession()
         } else {
             self.setupWithoutAutoTheme()
         }
     }
     
     func appDidEnterBackground(notification: NSNotification) {
-        println("App did enter background")
+        println("View: App did enter background")
         self.updateOpenButtonWait()
-        
-        if self.config.boolForKey("useAutoTheme") == true {
-            self.removeImageCaptureTimer()
-            self.endCaptureSession()
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -543,20 +307,15 @@ class OpenerViewController: UIViewController {
     //
     
     func handleSettingsUpdated() {
-        println("View told settings have updated")
+        println("View:  told settings have updated")
         self.setTheme()
         
         if config.boolForKey("useAutoTheme") == true {
-            println("  Use Auto Theme: true")
-            if self.captureSession == nil {
-                // only if we have a nil session to we need to start
-                println("  Auto theme not running - starting")
-                self.setupAutoTheme()
-            }
+            println("  View: Use Auto Theme: true - initializing labels")
+            self.initAutoThemeLabels()
+    
         } else {
-            println("  Use Auto Theme: false")
-            self.removeImageCaptureTimer()
-            self.endCaptureSession()
+            println("  View: Use Auto Theme: false")
             self.setupWithoutAutoTheme()
         }
     }
@@ -567,43 +326,31 @@ class OpenerViewController: UIViewController {
         
     }
     
-    
-    func handleCameraAccessDenined(notification: NSNotification) {
-        var capture = notification.object as GOCaptureController
-        
-        println("got camera access denied")
-        
-        var alert = UIAlertController(
-            title: "Theme Switching Disabled",
-            message: "Camera access for this app has been removed. " +
-                "Because of this theme switching has been disabled.\n\n" +
-                "To be able to switch themes automatically the camera is needed to " +
-                "measure light levels.\n\n" +
-                "If you wish to use this feature, please go to the " +
-                "iOS Settings for Garage Opener to " +
-                "enable access to the camera.",
-            preferredStyle: UIAlertControllerStyle.Alert
-        )
-        
-        alert.addAction(
-            UIAlertAction(
-                title: "OK",
-                style: UIAlertActionStyle.Default,
-                handler: { (action: UIAlertAction!) -> Void in
-                    self.notAuthorizedAlert = nil
-                }
-            )
-        )
-        
-        // only present view if use auto theme is actually true
-        if self.config.boolForKey("useAutoTheme") == true {
-            self.config.setBool(false, forKey: "useAutoTheme")
-            self.presentViewController(alert, animated: true, completion: nil)
-        }
-    }
-    
-    
     ///////////////////////////////////////////////////////////////////////
+    
+    func handleInputImage(notification: NSNotification) {
+        println("View: Got notification about input image: ")
+        var info = notification.userInfo as [String : CGFloat]
+        var luminance = Float(info["luminance"]!)
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            self.setAutoTheme(luminance)
+            
+            if let camera = captureCtrl.captureDevice {
+                var duration = CMTimeGetSeconds(camera.exposureDuration) * 1000
+                var time     = Int(round(duration))
+                var iso      = Int(camera.ISO)
+                
+                self.ISOValueLabel.text = String(iso)
+                self.expValueLabel.text = "\(time)/1000 s"
+                self.lumValueLabel.text = String(
+                    format: "%.2f",
+                    Float(luminance)
+                )
+            }
+        })
+    
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
