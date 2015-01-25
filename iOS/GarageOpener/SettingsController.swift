@@ -19,6 +19,7 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
     var config = NSUserDefaults.standardUserDefaults()
     var nc     = NSNotificationCenter.defaultCenter()
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -67,39 +68,14 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         config.setBool(sender.on, forKey: "useAutoTheme")
         
         if sender.on == true {
-            self.requestCameraAccess()
+            nc.postNotificationName(
+                "GOSettingsRequestCameraAccessNotification",
+                object: config
+            )
         }
     }
     
-    
-    func requestCameraAccess() {
-        AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo, completionHandler: { (access: Bool) -> Void in
-            println("Camera access status: \(access)")
-            var alert = UIAlertController(
-                title: "Theme Switching Disabled",
-                message: "This app does not have access to the camera. " +
-                    "Because of this theme switching has been disabled.\n\n" +
-                    "To be able to switch themes automatically the camera is needed to " +
-                    "measure light levels.\n\n" +
-                    "If you wish to use this feature, please go to the iOS " +
-                    "Settings for Garage Opener to enable access to the camera.",
-                preferredStyle: UIAlertControllerStyle.Alert
-            )
-            alert.addAction(UIAlertAction(
-                title: "OK",
-                style: UIAlertActionStyle.Default,
-                handler: nil
-            ))
-            
-            if access == false {
-                self.presentViewController(alert, animated: true, completion: { () -> Void in
-                    self.config.setBool(false, forKey: "useAutoTheme")
-                    self.themeAutoSwitch.setOn(false, animated: false)
-                })
-            }
-        })
-    }
-    
+
     @IBAction func handleShowPasswordChange(sender: UISwitch) {
         passwordField.secureTextEntry = !sender.on
         config.setBool(sender.on, forKey: "showPassword")
@@ -134,8 +110,11 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
             self.presentViewController(alert, animated: true, completion: nil)
         }
         
-        println("  - Setting auto theme = false")
-        self.config.setBool(false, forKey: "useAutoTheme")
+        dispatch_async(dispatch_get_main_queue(), {
+            println("  - Setting auto theme = false")
+            self.config.setBool(false, forKey: "useAutoTheme")
+            self.themeAutoSwitch.on = false
+        })
         
     }
     
