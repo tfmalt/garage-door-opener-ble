@@ -18,7 +18,6 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
     var videoOutput    : AVCaptureVideoDataOutput!
     var sessionQueue   : dispatch_queue_t!
     
-    var previewLayer   : AVCaptureVideoPreviewLayer?
     var cameraImage    : UIImage?
     
     var isAuthorized           : Bool?
@@ -157,10 +156,6 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
         self.videoOutput.videoSettings = [
             kCVPixelBufferPixelFormatTypeKey: NSNumber(integer: kCVPixelFormatType_32BGRA)
         ]
-        
-        self.previewLayer = AVCaptureVideoPreviewLayer.layerWithSession(self.captureSession) as? AVCaptureVideoPreviewLayer
-        self.previewLayer?.frame = CGRectMake(0, 0, 352, 288)
-        
     }
     
     /// Implementation of the capture output delegate function
