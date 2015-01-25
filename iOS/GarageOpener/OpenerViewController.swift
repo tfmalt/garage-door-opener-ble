@@ -30,24 +30,30 @@ class OpenerViewController: UIViewController {
     var isConnected : Bool?
     
     var needToShowCameraNotAuthorizedAlert : Bool = false
+    var hasShownCameraNotAuthorized        : Bool = false
     
     var config = NSUserDefaults.standardUserDefaults()
     let nc     = NSNotificationCenter.defaultCenter()
     
+    
+    /// Things to do when view has loaded.
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        statusLabel.text = "Initializing";
-        rssiLabel.text   = self.getConnectionBar(0)
         discovery        = BTDiscoveryManager()
         isConnected      = false
         
+        self.initLabels()
         self.makeButtonCircular()
         self.updateOpenButtonWait()
         self.registerObservers()
         self.setTheme()
-        
-        if config.boolForKey("useAutoTheme") == true {
+        self.checkAndConfigureAutoTheme()
+    }
+    
+    
+    func checkAndConfigureAutoTheme() {
+        if self.config.boolForKey("useAutoTheme") == true {
             println("View: auto theme true - trying to init capture.")
             self.initAutoThemeLabels()
             self.captureCtrl.initializeCaptureSession()
@@ -57,10 +63,21 @@ class OpenerViewController: UIViewController {
         }
     }
     
+    
+    func initLabels() {
+        self.statusLabel.text   = "Initializing";
+        self.rssiLabel.text     = self.getConnectionBar(0)
+        self.ISOValueLabel.text = ""
+        self.expValueLabel.text = ""
+        self.lumValueLabel.text = ""
+    }
+    
     override func viewDidAppear(animated: Bool) {
         if self.needToShowCameraNotAuthorizedAlert == true {
             self.showCameraNotAuthorizedAlert()
         }
+        
+        self.hasShownCameraNotAuthorized = true
     }
     
     func showCameraNotAuthorizedAlert() {
@@ -72,19 +89,30 @@ class OpenerViewController: UIViewController {
     
     func handleCaptureDeviceNotAuthorized(notification: NSNotification) {
         println("View: got notified capture is not authorized.")
-        if (self.isViewLoaded() && (self.view.window != nil)) {
-            self.showCameraNotAuthorizedAlert()
+        
+        config.setBool(false, forKey: "useAutoTheme")
+        self.setupWithoutAutoTheme()
+        if self.hasShownCameraNotAuthorized == false {
+            if (self.isViewLoaded() && (self.view.window != nil)) {
+                self.showCameraNotAuthorizedAlert()
+            } else {
+                self.needToShowCameraNotAuthorizedAlert = true
+            }
         } else {
-            self.needToShowCameraNotAuthorizedAlert = true
+            println("  - View: alert already shown - not showing again.")
         }
     }
 
+    
+    func handleCaptureDeviceAuthorizationNotDetermined(notification: NSNotification) {
+        setupWithoutAutoTheme()
+        config.setBool(false, forKey: "useAutoTheme")
+    }
     
     func initAutoThemeLabels() {
         ISOLabel.text = "ISO:"
         expLabel.text = "Exp:"
         lumLabel.text = "Lum:"
-        
     }
     
     
@@ -269,6 +297,13 @@ class OpenerViewController: UIViewController {
             name: "GOCaptureDeviceNotAuthorizedNotification",
             object: nil
         )
+        
+        nc.addObserver(
+            self,
+            selector: "handleCaptureDeviceAuthorizationNotDetermined:",
+            name: "GOCaptureDeviceAuthorizationNotDetermined",
+            object: nil
+        )
     }
     
     ///////////////////////////////////////////////////////////////////////
@@ -310,12 +345,9 @@ class OpenerViewController: UIViewController {
         println("View:  told settings have updated")
         self.setTheme()
         
-        if config.boolForKey("useAutoTheme") == true {
-            println("  View: Use Auto Theme: true - initializing labels")
+        if self.config.boolForKey("useAutoTheme") == true {
             self.initAutoThemeLabels()
-    
         } else {
-            println("  View: Use Auto Theme: false")
             self.setupWithoutAutoTheme()
         }
     }
