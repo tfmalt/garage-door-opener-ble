@@ -105,7 +105,7 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         self.passwordField.resignFirstResponder()
         self.dismissViewControllerAnimated(true, completion: nil)
         
-        nc.postNotificationName("settingsUpdated", object: config)
+        nc.postNotificationName("SettingsUpdatedNotification", object: config)
     }
     
     
@@ -114,7 +114,7 @@ class SettingsController : UITableViewController, UITextFieldDelegate {
         self.dismissViewControllerAnimated(true, completion: nil)
         self.passwordField.resignFirstResponder()
         
-        nc.postNotificationName("settingsCancelled", object: config)
+        nc.postNotificationName("SettingsCancelledNotification", object: config)
     }
     
     
