@@ -20,6 +20,7 @@ contribute or ask for features or functionality.
 ### TODO
 * Stop scanning after 30s
 * update colors: green and orange
+* Disable spinner when connected.
 
 ### DONE
 * Add activty indicator when scanning.
