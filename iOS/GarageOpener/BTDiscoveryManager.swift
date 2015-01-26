@@ -17,7 +17,10 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     
     let btConst = BTConstants()
     
-    var rssiTimer : NSTimer?
+    var rssiTimer   : NSTimer?
+    var scanTimeout : NSTimer?
+    
+    let btQueue : dispatch_queue_t!
     
     var activePeripheral : CBPeripheral? {
         didSet {
@@ -49,8 +52,8 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
             object: nil
         )
         
-        let queue = dispatch_queue_create("no.malt", DISPATCH_QUEUE_SERIAL)
-        centralManager = CBCentralManager(delegate: self, queue: queue)
+        self.btQueue = dispatch_queue_create("no.malt.btdiscovery", DISPATCH_QUEUE_SERIAL)
+        centralManager = CBCentralManager(delegate: self, queue: self.btQueue)
         
         rssiTimer = NSTimer.scheduledTimerWithTimeInterval(
             2.0,
@@ -60,12 +63,6 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
             repeats: true
         )
     }
-    
-    func sayHello() -> String {
-        println("Testing output.");
-        return "Hello from BTDiscovery.";
-    }
-    
     
     func appDidEnterBackground() {
         println("Discovery Manager: did enter background")
@@ -91,11 +88,13 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     func appWillEnterForeground() {
         println("Discovery Manager: will enter foreground")
         
-        if self.centralManager?.state == CBCentralManagerState.PoweredOn {
-            self.startScanning()
-        }
-        else {
-            println("  App became active but Bluetooth not on.")
+        if let central = self.centralManager {
+            if central.state == CBCentralManagerState.PoweredOn {
+                self.startScanning()
+            }
+            else {
+                println("  App became active but Bluetooth not on.")
+            }
         }
     }
     
@@ -112,19 +111,68 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     
 
     func startScanning() {
-        nc.postNotificationName("btStateChangedNotification", object: "Scanning")
-        
         if let central = self.centralManager {
-            central.scanForPeripheralsWithServices(
-                [CBUUID(string: btConst.SERVICE_UUID)],
-                options: nil
-            )
+            if central.state == CBCentralManagerState.PoweredOff {
+                self.resetConnection()
+                nc.postNotificationName(
+                    "btStateChangedNotification",
+                    object: "Bluetooth Off"
+                )
+                return
+            }
+            
+            if central.state == CBCentralManagerState.PoweredOn {
+                nc.postNotificationName(
+                    "btStateChangedNotification",
+                    object: "Scanning"
+                )
+        
+                central.scanForPeripheralsWithServices(
+                    [CBUUID(string: btConst.SERVICE_UUID)],
+                    options: nil
+                )
+            
+                NSLog("BTDiscovery: setting timer to stop scan:")
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.scanTimeout = NSTimer.scheduledTimerWithTimeInterval(
+                        30.0,
+                        target: self,
+                        selector: "handleCheckAndStopScan",
+                        userInfo: nil,
+                        repeats: false
+                    )
+                })
+                
+                return
+            }
+            
+            NSLog("BTDiscovery: Got other state than expected: \(central.state)")
         }
     }
     
     func resetConnection() {
         self.activeService = nil
         self.activePeripheral = nil
+    }
+    
+    
+    /// handler for NSTimer to stop the scanner after a set interval.
+    func handleCheckAndStopScan() {
+        NSLog("BTDiscovery: Told to check and stop scan.")
+        if let centr = self.centralManager {
+            if centr.state != CBCentralManagerState.PoweredOn {
+                self.resetConnection()
+                return
+            }
+            
+            centr.stopScan()
+            nc.postNotificationName(
+                "BTDiscoveryScanningTimedOutNotification",
+                object: self,
+                userInfo: nil
+            )
+        }
+        
     }
     
     
@@ -221,9 +269,10 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
         
         var msg = "Low Signal: \(signal)"
         nc.postNotificationName("btStateChangedNotification", object: msg)
-        
-        self.centralManager?.stopScan()
-        self.resetConnection()
+        if let central = self.centralManager {
+            central.stopScan()
+            self.resetConnection()
+        }
         
         delay(1.0) {
             // Wait one second to start scanning again.
