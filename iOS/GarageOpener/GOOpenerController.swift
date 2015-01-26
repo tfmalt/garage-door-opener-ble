@@ -21,9 +21,30 @@ class GOOpenerController: UIViewController {
     @IBOutlet weak var lumValueLabel: UILabel!
     @IBOutlet weak var lumLabel: UILabel!
     
+    let BUTTON_COLOR_WAIT_NORMAL          = UIColor.colorWithHex("#CC0000")
+    let BUTTON_COLOR_WAIT_HIGHLIGHT       = UIColor.colorWithHex("#CC0000")
+    let BUTTON_COLOR_OPEN_NORMAL          = UIColor.colorWithHex("#00CC00")
+    let BUTTON_COLOR_OPEN_HIGHLIGHT       = UIColor.colorWithHex("#008800")
+    let BUTTON_COLOR_SCANNING_NORMAL      = UIColor.colorWithHex("#FF6600") // "#FF8800")
+    let BUTTON_COLOR_SCANNING_HIGHLIGHT   = UIColor.colorWithHex("#CC0000") // 880000")
+    let BUTTON_COLOR_START_SCAN_NORMAL    = UIColor.colorWithHex("#4488CC")
+    let BUTTON_COLOR_START_SCAN_HIGHLIGHT = UIColor.colorWithHex("#4488CC")
+    
+    enum States {
+        case Connected
+        case Initializing
+        case Scanning
+        case Waiting
+        case DeviceNotFound
+        case DeviceFound
+        case BluetoothOff
+        case Disconnected
+    }
+    
+    var currentState = States.Disconnected
+    
     var discovery   : BTDiscoveryManager?
     var captureCtrl : GOCaptureController = GOCaptureController()
-    var isConnected : Bool?
     
     var needToShowCameraNotAuthorizedAlert : Bool = false
     var hasShownCameraNotAuthorized        : Bool = false
@@ -32,12 +53,8 @@ class GOOpenerController: UIViewController {
     let nc     = NSNotificationCenter.defaultCenter()
     
     
-    /// Things to do when view has loaded.
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        discovery        = BTDiscoveryManager()
-        isConnected      = false
         
         self.initLabels()
         self.makeButtonCircular()
@@ -45,6 +62,8 @@ class GOOpenerController: UIViewController {
         self.registerObservers()
         self.setTheme()
         self.checkAndConfigureAutoTheme()
+        
+        self.discovery = BTDiscoveryManager()
     }
     
     
@@ -66,6 +85,7 @@ class GOOpenerController: UIViewController {
         self.lumValueLabel.text = ""
     }
     
+    
     override func viewDidAppear(animated: Bool) {
         if self.needToShowCameraNotAuthorizedAlert == true {
             self.showCameraNotAuthorizedAlert()
@@ -74,12 +94,14 @@ class GOOpenerController: UIViewController {
         self.hasShownCameraNotAuthorized = true
     }
     
+    
     func showCameraNotAuthorizedAlert() {
         let alert = self.captureCtrl.getCameraNotAuthorizedAlert()
         self.presentViewController(alert, animated: true, completion: { () -> Void in
             self.needToShowCameraNotAuthorizedAlert = false
         })
     }
+    
     
     func handleCaptureDeviceNotAuthorized(notification: NSNotification) {
         println("View: got notified capture is not authorized.")
@@ -102,6 +124,7 @@ class GOOpenerController: UIViewController {
         setupWithoutAutoTheme()
         config.setBool(false, forKey: "useAutoTheme")
     }
+    
     
     func initAutoThemeLabels() {
         lumLabel.text = "Lum:"
@@ -233,6 +256,13 @@ class GOOpenerController: UIViewController {
             self,
             selector: Selector("btStateChanged:"),
             name: "btStateChangedNotification",
+            object: nil
+        )
+        
+        nc.addObserver(
+            self,
+            selector: "handleBTScanningTimedOut:",
+            name: "BTDiscoveryScanningTimedOutNotification",
             object: nil
         )
         
@@ -377,22 +407,39 @@ class GOOpenerController: UIViewController {
     
 
     @IBAction func openButtonPressed(sender: UIButton) {
-        let rx = self.getRXCharacteristic()
-        if rx == nil { return }
-       
-        let peripheral = self.getActivePeripheral()
-        if peripheral == nil { return }
+        if self.currentState == States.Connected {
+            self.sendOpenCommand()
+            return
+        }
         
-        if let pass = config.valueForKey("password") as? String {
-            var str = "0" + pass;
-            var data : NSData = str.dataUsingEncoding(NSUTF8StringEncoding)!
-        
-            peripheral?.writeValue(data, forCharacteristic: rx, type: CBCharacteristicWriteType.WithoutResponse)
-        } else {
-            println("Did not find valid password, so not writing anything")
+        if self.currentState == States.DeviceNotFound {
+            NSLog("GOOpener: button pressed: state: device not found")
+            if let discovery = self.discovery {
+                discovery.startScanning()
+            }
+            return
         }
     }
     
+    
+    func sendOpenCommand() {
+        if let rx = self.getRXCharacteristic() {
+            if let peripheral = self.getActivePeripheral() {
+                if let pass = config.valueForKey("password") as? String {
+                    var str = "0" + pass;
+                    var data : NSData = str.dataUsingEncoding(NSUTF8StringEncoding)!
+                    
+                    peripheral.writeValue(
+                        data,
+                        forCharacteristic: rx,
+                        type: CBCharacteristicWriteType.WithoutResponse
+                    )
+                } else {
+                    println("Did not find valid password, so not writing anything")
+                }
+            }
+        }
+    }
     
     func getActivePeripheral() -> CBPeripheral? {
         if self.discovery == nil {
@@ -435,14 +482,14 @@ class GOOpenerController: UIViewController {
     
     
     func updateOpenButtonWait() {
-        let color = UIColor(red: 0.9, green: 0.0, blue: 0.0, alpha: 1.0)
+        
+        UIView.animateWithDuration(0.5, animations: {
+            self.openButton.backgroundColor = self.BUTTON_COLOR_WAIT_NORMAL
+        })
         
         openButton.setBackgroundImage(
-            UIImage.imageWithColor(color), forState: UIControlState.Normal
-        )
-        
-        openButton.setBackgroundImage(
-            UIImage.imageWithColor(color), forState: UIControlState.Highlighted
+            UIImage.imageWithColor(BUTTON_COLOR_WAIT_HIGHLIGHT),
+            forState: UIControlState.Highlighted
         )
 
         openButton.setTitle("Wait", forState: UIControlState.Normal)
@@ -450,19 +497,47 @@ class GOOpenerController: UIViewController {
     
     
     func updateOpenButtonNormal() {
-        openButton.setBackgroundImage(
-            UIImage.imageWithColor(UIColor.colorWithHex("#66CC55")),
-            forState: UIControlState.Normal
-        )
+        
+        UIView.animateWithDuration(0.5, animations: {
+            self.openButton.backgroundColor = self.BUTTON_COLOR_OPEN_NORMAL
+        })
         
         openButton.setBackgroundImage(
-            UIImage.imageWithColor(UIColor.colorWithHex("#338822")),
+            UIImage.imageWithColor(BUTTON_COLOR_OPEN_HIGHLIGHT),
             forState: UIControlState.Highlighted
         )
         
         self.openButton.setTitle("Open", forState: UIControlState.Normal)
     }
     
+    func updateOpenButtonScanning() {
+        
+        UIView.animateWithDuration(0.5, animations: {
+            self.openButton.backgroundColor = self.BUTTON_COLOR_SCANNING_NORMAL
+        })
+        
+        self.openButton.setBackgroundImage(
+            UIImage.imageWithColor(BUTTON_COLOR_SCANNING_NORMAL),
+            forState: UIControlState.Highlighted
+        )
+        
+        self.openButton.setTitle("Wait", forState: UIControlState.Normal)
+    }
+    
+    func updateOpenButtonStartScan() {
+        
+        UIView.animateWithDuration(0.5, animations: {
+            self.openButton.backgroundColor = self.BUTTON_COLOR_START_SCAN_NORMAL
+        })
+        
+        self.openButton.setBackgroundImage(
+            UIImage.imageWithColor(BUTTON_COLOR_START_SCAN_HIGHLIGHT),
+            forState: UIControlState.Highlighted
+        )
+
+        
+        openButton.setTitle("Start", forState: UIControlState.Normal)
+    }
     
     func makeButtonCircular() {
         openButton.frame = CGRectMake(0, 0, 180, 180);
@@ -479,19 +554,12 @@ class GOOpenerController: UIViewController {
     /// :returns: nil
     func btStateChanged(notification: NSNotification) {
         var msg = notification.object as String
-        var log = msg
         
-        if msg == "Disconnected" {
-            var info       = notification.userInfo as [String: CBPeripheral]
-            var peripheral = info["peripheral"]
-            var name       = peripheral?.name
-            
-            log = "\(String(name!)) disconnected"
-        }
+        NSLog("GOOpener: bt state changed: got notification: \(msg)")
         
-        println("got notification: \(msg)")
         dispatch_async(dispatch_get_main_queue(), {
             if (msg.hasPrefix("Low Signal")) {
+                self.currentState = States.Scanning
                 return
             }
             
@@ -502,14 +570,17 @@ class GOOpenerController: UIViewController {
             }
             
             if (msg == "Disconnected") {
+                self.currentState = States.Disconnected
                 self.updateOpenButtonWait()
             }
             else if (msg == "Bluetooth Off") {
+                self.currentState = States.BluetoothOff
                 self.updateOpenButtonWait()
                 self.rssiLabel.text = self.getConnectionBar(0)
             }
             else if (msg == "Scanning") {
-                self.updateOpenButtonWait()
+                self.currentState = States.Scanning
+                self.updateOpenButtonScanning()
                 self.rssiLabel.text = self.getConnectionBar(0)
                 self.activityIndicator.startAnimating()
             }
@@ -517,19 +588,42 @@ class GOOpenerController: UIViewController {
     }
     
     
+    func handleBTScanningTimedOut(notification: NSNotification) {
+        self.currentState = States.DeviceNotFound
+        dispatch_async(dispatch_get_main_queue(), {
+            self.updateOpenButtonWait()
+            self.rssiLabel.text = self.getConnectionBar(0)
+            self.activityIndicator.stopAnimating()
+            self.statusLabel.text = "Device Not Found"
+            
+            self.delay(2.0) {
+                self.updateOpenButtonStartScan()
+                self.statusLabel.text = "Scan Finished"
+            }
+        })
+    }
+    
+    
+    /// Handler for the connection.
     func btConnectionChanged(notification: NSNotification) {
         println("got connection changed notification: \(notification)")
         
-        let userinfo = notification.userInfo as [String: Bool]
-        let service  = notification.object as BTService
-        let peripheral = service.peripheral
+        let info = notification.userInfo as [String: AnyObject]
+        var name = info["name"]          as NSString
         
-        if let isConnected: Bool = userinfo["isConnected"] {
-            self.isConnected = isConnected
+        if name.length < 1 {
+            name = ""
+        } else {
+            name = " to " + name
+        }
+        
+        if let isConnected = info["isConnected"] as? Bool {
+            self.currentState = States.Connected
             
             dispatch_async(dispatch_get_main_queue(), {
                 self.updateOpenButtonNormal()
-                self.statusLabel.text = "Connected"
+                self.statusLabel.text = "Connected\(name)"
+                self.activityIndicator.stopAnimating()
             })
         
         }
@@ -543,6 +637,7 @@ class GOOpenerController: UIViewController {
         var rssi       = info["RSSI"]          as NSNumber
         var name       = String(peripheral.name)
         
+        self.currentState = States.DeviceFound
         dispatch_async(dispatch_get_main_queue(), {
             self.openButton.backgroundColor = UIColor.orangeColor()
             self.statusLabel.text = "Found Device..."
