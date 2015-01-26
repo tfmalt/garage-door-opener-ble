@@ -38,12 +38,23 @@ class BTService : NSObject, CBPeripheralDelegate {
     
     func startDiscoveringServices() {
         println("Starting discover services")
-        self.peripheral?.discoverServices([CBUUID(string: btConst.SERVICE_UUID)])
+        
+        if let peri = self.peripheral {
+            peri.discoverServices([CBUUID(string: btConst.SERVICE_UUID)])
+        }
     }
     
     func sendNotificationIsConnected(connected: Bool) {
-        let info = ["isConnected": connected]
-        nc.postNotificationName("btConnectionChangedNotification", object: self, userInfo: info)
+        if let peripheral = self.peripheral {
+            nc.postNotificationName(
+                "btConnectionChangedNotification",
+                object: self,
+                userInfo: [
+                    "isConnected": connected,
+                    "name": peripheral.name
+                ]
+            )
+        }
     }
     
     //
