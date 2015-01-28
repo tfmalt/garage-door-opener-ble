@@ -28,6 +28,8 @@ contribute or ask for features or functionality.
 
 ### TODO
 ### DONE
+* Fix crash on iPhone 4s
+* Fix resetting the scan timer when connecting - or for all states
 * Stop scanning after 30s
 * update colors: green and orange
 * Disable spinner when connected.
