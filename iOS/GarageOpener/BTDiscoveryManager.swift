@@ -109,7 +109,8 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
         )
     }
     
-
+    /// Called to start scanning for devices.
+    /// Also sets a timer to stop scanning after a given time.
     func startScanning() {
         if let central = self.centralManager {
             if central.state == CBCentralManagerState.PoweredOff {
@@ -153,14 +154,18 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     func resetConnection() {
         self.activeService = nil
         self.activePeripheral = nil
-        
+        self.resetScanTimeout()
+    }
+    
+    /// This function invalidates the timer which cancels the scanning after
+    /// a given interval.
+    func resetScanTimeout() {
         if let scan = self.scanTimeout {
             if scan.valid == true {
                 scan.invalidate()
             }
         }
     }
-    
     
     /// handler for NSTimer to stop the scanner after a set interval.
     func handleCheckAndStopScan() {
@@ -192,6 +197,7 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
         self.activePeripheral?.readRSSI()
     }
     
+    ////////////////////////////////////////////////////////////////////////
     //
     // Implementation of CBCentralManagerDelegate
     //
@@ -217,9 +223,12 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
         
         println("Stopping scan!")
         central.stopScan()
+        self.resetScanTimeout()
+        
     }
     
     
+    /// called when thing disconnects.
     func centralManager(central: CBCentralManager!, didDisconnectPeripheral peripheral: CBPeripheral!, error: NSError!) {
         println("Called did Disconnect Peripheral: \(peripheral)")
         
@@ -240,11 +249,7 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     }
     
     
-    func centralManager(
-        central: CBCentralManager!,
-        didDiscoverPeripheral peripheral: CBPeripheral!,
-        advertisementData: [NSObject : AnyObject]!,
-        RSSI: NSNumber!) {
+    func centralManager(central: CBCentralManager!, didDiscoverPeripheral peripheral: CBPeripheral!, advertisementData: [NSObject : AnyObject]!, RSSI: NSNumber!) {
         
         let uuid = peripheral.identifier.UUIDString;
         
