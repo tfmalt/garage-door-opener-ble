@@ -13,6 +13,19 @@ import AVFoundation
 // Constructing global singleton of this
 var captureCtrl : GOCaptureController = GOCaptureController()
 
+// Struct containing the colors I use.
+struct GOOpenerColors {
+    let wait              = UIColor.colorWithHex("#D00000")!
+    let waitHighlight     = UIColor.colorWithHex("#D00000")!
+    let open              = UIColor.colorWithHex("#33BB33")!
+    let openHighlight     = UIColor.colorWithHex("#208840")!
+    let scanning          = UIColor.colorWithHex("#D00000")!
+    let scanningHighlight = UIColor.colorWithHex("#D00000")!
+    let start             = UIColor.colorWithHex("#1080C0")! //  FFAA00
+    let startHighlight    = UIColor.colorWithHex("#0C4778")! // 0C4778 FFDD00
+}
+
+
 class GOOpenerController: UIViewController {
     @IBOutlet weak var openButton: UIButton!
     @IBOutlet weak var statusLabel: UILabel!
@@ -21,15 +34,9 @@ class GOOpenerController: UIViewController {
     @IBOutlet weak var lumValueLabel: UILabel!
     @IBOutlet weak var lumLabel: UILabel!
     
-    let BUTTON_COLOR_WAIT_NORMAL          = UIColor.colorWithHex("#D00000")
-    let BUTTON_COLOR_WAIT_HIGHLIGHT       = UIColor.colorWithHex("#D00000")
-    let BUTTON_COLOR_OPEN_NORMAL          = UIColor.colorWithHex("#33BB33")
-    let BUTTON_COLOR_OPEN_HIGHLIGHT       = UIColor.colorWithHex("#208840")
-    let BUTTON_COLOR_SCANNING_NORMAL      = UIColor.colorWithHex("#D00000") // "#FF8800")
-    let BUTTON_COLOR_SCANNING_HIGHLIGHT   = UIColor.colorWithHex("#D00000") // 880000")
-    let BUTTON_COLOR_START_SCAN_NORMAL    = UIColor.colorWithHex("#FFAA00") //#4488CC")
-    let BUTTON_COLOR_START_SCAN_HIGHLIGHT = UIColor.colorWithHex("#FFDD00") //#4488CC")
+    let Colors = GOOpenerColors()
     
+    // An enum to keep track of the application states defined.
     enum States {
         case Connected
         case Initializing
@@ -40,6 +47,7 @@ class GOOpenerController: UIViewController {
         case BluetoothOff
         case Disconnected
     }
+    
     
     var currentState = States.Disconnected
     
@@ -484,11 +492,11 @@ class GOOpenerController: UIViewController {
     func updateOpenButtonWait() {
         
         UIView.animateWithDuration(0.5, animations: {
-            self.openButton.backgroundColor = self.BUTTON_COLOR_WAIT_NORMAL
+            self.openButton.backgroundColor = self.Colors.wait
         })
         
         openButton.setBackgroundImage(
-            UIImage.imageWithColor(BUTTON_COLOR_WAIT_HIGHLIGHT),
+            UIImage.imageWithColor(self.Colors.wait),
             forState: UIControlState.Highlighted
         )
 
@@ -499,11 +507,11 @@ class GOOpenerController: UIViewController {
     func updateOpenButtonNormal() {
         
         UIView.animateWithDuration(0.5, animations: {
-            self.openButton.backgroundColor = self.BUTTON_COLOR_OPEN_NORMAL
+            self.openButton.backgroundColor = self.Colors.open
         })
         
         openButton.setBackgroundImage(
-            UIImage.imageWithColor(BUTTON_COLOR_OPEN_HIGHLIGHT),
+            UIImage.imageWithColor(self.Colors.openHighlight),
             forState: UIControlState.Highlighted
         )
         
@@ -513,11 +521,11 @@ class GOOpenerController: UIViewController {
     func updateOpenButtonScanning() {
         
         UIView.animateWithDuration(0.5, animations: {
-            self.openButton.backgroundColor = self.BUTTON_COLOR_SCANNING_NORMAL
+            self.openButton.backgroundColor = self.Colors.scanning
         })
         
         self.openButton.setBackgroundImage(
-            UIImage.imageWithColor(BUTTON_COLOR_SCANNING_NORMAL),
+            UIImage.imageWithColor(self.Colors.scanning),
             forState: UIControlState.Highlighted
         )
         
@@ -527,11 +535,11 @@ class GOOpenerController: UIViewController {
     func updateOpenButtonStartScan() {
         
         UIView.animateWithDuration(0.5, animations: {
-            self.openButton.backgroundColor = self.BUTTON_COLOR_START_SCAN_NORMAL
+            self.openButton.backgroundColor = self.Colors.start
         })
         
         self.openButton.setBackgroundImage(
-            UIImage.imageWithColor(BUTTON_COLOR_START_SCAN_HIGHLIGHT),
+            UIImage.imageWithColor(self.Colors.startHighlight),
             forState: UIControlState.Highlighted
         )
 
