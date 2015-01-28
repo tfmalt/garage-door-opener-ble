@@ -34,7 +34,8 @@ class GOOpenerController: UIViewController {
     @IBOutlet weak var lumValueLabel: UILabel!
     @IBOutlet weak var lumLabel: UILabel!
     
-    let Colors = GOOpenerColors()
+    let Colors            = GOOpenerColors()
+    let animationDuration = 1.0
     
     // An enum to keep track of the application states defined.
     enum States {
@@ -491,7 +492,7 @@ class GOOpenerController: UIViewController {
     
     func updateOpenButtonWait() {
         
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(1.0, animations: {
             self.openButton.backgroundColor = self.Colors.wait
         })
         
@@ -506,7 +507,7 @@ class GOOpenerController: UIViewController {
     
     func updateOpenButtonNormal() {
         
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(1.0, animations: {
             self.openButton.backgroundColor = self.Colors.open
         })
         
@@ -520,7 +521,7 @@ class GOOpenerController: UIViewController {
     
     func updateOpenButtonScanning() {
         
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(1.0, animations: {
             self.openButton.backgroundColor = self.Colors.scanning
         })
         
@@ -534,7 +535,7 @@ class GOOpenerController: UIViewController {
     
     func updateOpenButtonStartScan() {
         
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(1.0, animations: {
             self.openButton.backgroundColor = self.Colors.start
         })
         
