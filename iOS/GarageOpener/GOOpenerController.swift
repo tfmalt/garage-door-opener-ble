@@ -21,14 +21,14 @@ class GOOpenerController: UIViewController {
     @IBOutlet weak var lumValueLabel: UILabel!
     @IBOutlet weak var lumLabel: UILabel!
     
-    let BUTTON_COLOR_WAIT_NORMAL          = UIColor.colorWithHex("#CC0000")
-    let BUTTON_COLOR_WAIT_HIGHLIGHT       = UIColor.colorWithHex("#CC0000")
-    let BUTTON_COLOR_OPEN_NORMAL          = UIColor.colorWithHex("#00CC00")
-    let BUTTON_COLOR_OPEN_HIGHLIGHT       = UIColor.colorWithHex("#008800")
-    let BUTTON_COLOR_SCANNING_NORMAL      = UIColor.colorWithHex("#FF6600") // "#FF8800")
-    let BUTTON_COLOR_SCANNING_HIGHLIGHT   = UIColor.colorWithHex("#CC0000") // 880000")
-    let BUTTON_COLOR_START_SCAN_NORMAL    = UIColor.colorWithHex("#4488CC")
-    let BUTTON_COLOR_START_SCAN_HIGHLIGHT = UIColor.colorWithHex("#4488CC")
+    let BUTTON_COLOR_WAIT_NORMAL          = UIColor.colorWithHex("#D00000")
+    let BUTTON_COLOR_WAIT_HIGHLIGHT       = UIColor.colorWithHex("#D00000")
+    let BUTTON_COLOR_OPEN_NORMAL          = UIColor.colorWithHex("#33BB33")
+    let BUTTON_COLOR_OPEN_HIGHLIGHT       = UIColor.colorWithHex("#208840")
+    let BUTTON_COLOR_SCANNING_NORMAL      = UIColor.colorWithHex("#D00000") // "#FF8800")
+    let BUTTON_COLOR_SCANNING_HIGHLIGHT   = UIColor.colorWithHex("#D00000") // 880000")
+    let BUTTON_COLOR_START_SCAN_NORMAL    = UIColor.colorWithHex("#FFAA00") //#4488CC")
+    let BUTTON_COLOR_START_SCAN_HIGHLIGHT = UIColor.colorWithHex("#FFDD00") //#4488CC")
     
     enum States {
         case Connected
