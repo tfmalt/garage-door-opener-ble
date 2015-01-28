@@ -145,6 +145,8 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
     }
     
     /// Implementation of the capture output delegate function
+    /// implements the sample buffer event handler and converts the buffer
+    /// into an UIImage for processing.
     func captureOutput(captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
         
         var imageBuffer : CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
@@ -228,9 +230,7 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
             camera.lockForConfiguration(nil)
             println("Locking device configuration")
             
-            // set framerate
-            camera.activeVideoMinFrameDuration = CMTimeMake(1, 1)
-            camera.activeVideoMaxFrameDuration = CMTimeMake(1, 1)
+            self.setCaptureDeviceFrameRate(camera)
             
             // Set exposure
             if camera.isExposureModeSupported(AVCaptureExposureMode.Custom) {
@@ -251,6 +251,26 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
             camera.unlockForConfiguration()
             println("Unlocked device configuration")
             
+        }
+    }
+    
+    /// configures the minimal framerate possible to evaluate data.
+    private func setCaptureDeviceFrameRate(camera: AVCaptureDevice!) {
+        var fpsRange = camera.activeFormat.videoSupportedFrameRateRanges
+        
+        println("Frame rate range: \(fpsRange)")
+        println("  Count: \(fpsRange.count)")
+        
+        if let range = fpsRange.first as? AVFrameRateRange {
+            println("  range: \(range)")
+            println("    \(CMTimeGetSeconds(range.minFrameDuration))")
+            println("    \(CMTimeGetSeconds(range.maxFrameDuration))")
+            
+            // set framerate
+            camera.activeVideoMinFrameDuration = range.maxFrameDuration
+            camera.activeVideoMaxFrameDuration = range.maxFrameDuration
+        } else {
+            println("Frame rate range not returned - an error")
         }
     }
     
@@ -289,10 +309,9 @@ class GOCaptureController: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
                 }
             }
             
-            self.captureSession = nil
-            self.videoOutput    = nil
-            self.captureDevice  = nil
-            
+            self.captureSession      = nil
+            self.videoOutput         = nil
+            self.captureDevice       = nil
             self.isSessionConfigured = false
         })
     }
