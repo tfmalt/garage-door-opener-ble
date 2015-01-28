@@ -153,6 +153,12 @@ class BTDiscoveryManager: NSObject, CBCentralManagerDelegate {
     func resetConnection() {
         self.activeService = nil
         self.activePeripheral = nil
+        
+        if let scan = self.scanTimeout {
+            if scan.valid == true {
+                scan.invalidate()
+            }
+        }
     }
     
     
