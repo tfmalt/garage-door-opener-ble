@@ -262,14 +262,19 @@
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="GOQ-qi-PFQ" id="ZeD-F9-Cnc">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Theme change will require access to the front camera. Image data is used for calculating light levels then discarded." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="304" translatesAutoresizingMaskIntoConstraints="NO" id="fvr-Io-IWY">
-                                                    <rect key="frame" x="8" y="0.0" width="304" height="76"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Theme change will require access to the front camera. Image data is used for calculating light levels then discarded." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="304" translatesAutoresizingMaskIntoConstraints="NO" id="fvr-Io-IWY">
+                                                    <rect key="frame" x="16" y="8" width="296" height="51"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
                                             <color key="backgroundColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="fvr-Io-IWY" firstAttribute="top" secondItem="ZeD-F9-Cnc" secondAttribute="topMargin" id="YjF-HX-Xbf"/>
+                                                <constraint firstItem="fvr-Io-IWY" firstAttribute="leading" secondItem="ZeD-F9-Cnc" secondAttribute="leadingMargin" constant="8" id="dwF-ti-GOY"/>
+                                                <constraint firstItem="fvr-Io-IWY" firstAttribute="trailing" secondItem="ZeD-F9-Cnc" secondAttribute="trailingMargin" id="eqE-pf-7z7"/>
+                                            </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </cells>
@@ -305,7 +310,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xXK-Br-PD4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1562" y="462"/>
+            <point key="canvasLocation" x="1562" y="459"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="5ga-aY-fl8">
