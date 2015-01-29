@@ -113,9 +113,9 @@ class GOOpenerController: UIViewController {
     
     
     func initLabels() {
-        self.statusLabel.text   = "Initializing";
         self.lumValueLabel.text = ""
         
+        self.setStatusLabel("Initializing")
         self.setSignalLevel(0)
     }
     
@@ -129,6 +129,13 @@ class GOOpenerController: UIViewController {
         
         if let label = self.rssiLabel {
             label.text = self.getConnectionBar(strength)
+        }
+    }
+    
+    /// updates the status label with new text.
+    func setStatusLabel(text: String) {
+        if let label = self.statusLabel {
+            label.text = text
         }
     }
     
@@ -607,7 +614,7 @@ class GOOpenerController: UIViewController {
                 return
             }
             
-            self.statusLabel.text = msg
+            self.setStatusLabel(msg)
 
             if (msg != "Scanning") {
                 self.activityIndicator.stopAnimating()
@@ -638,11 +645,11 @@ class GOOpenerController: UIViewController {
             self.updateOpenButtonWait()
             self.setSignalLevel(0)
             self.activityIndicator.stopAnimating()
-            self.statusLabel.text = "Device Not Found"
+            self.setStatusLabel("Device Not Found")
             
             self.delay(2.0) {
                 self.updateOpenButtonStartScan()
-                self.statusLabel.text = "Scan Finished"
+                self.setStatusLabel("Scan Finished")
             }
         })
     }
@@ -650,8 +657,6 @@ class GOOpenerController: UIViewController {
     
     /// Handler for the connection.
     func btConnectionChanged(notification: NSNotification) {
-        println("got connection changed notification: \(notification)")
-        
         let info = notification.userInfo as [String: AnyObject]
         var name = info["name"]          as NSString
         
@@ -666,16 +671,14 @@ class GOOpenerController: UIViewController {
             
             dispatch_async(dispatch_get_main_queue(), {
                 self.updateOpenButtonNormal()
-                self.statusLabel.text = "Connected\(name)"
+                self.setStatusLabel("Connected\(name)")
                 self.activityIndicator.stopAnimating()
             })
         
         }
     }
     
-    func btFoundDevice(notification: NSNotification) {
-        println("got found device notification: \(notification)")
-        
+    func btFoundDevice(notification: NSNotification) {        
         let info       = notification.userInfo as [String: AnyObject]
         var peripheral = info["peripheral"]    as CBPeripheral
         var rssi       = info["RSSI"]          as NSNumber
@@ -684,7 +687,7 @@ class GOOpenerController: UIViewController {
         self.currentState = States.DeviceFound
         dispatch_async(dispatch_get_main_queue(), {
             self.openButton.backgroundColor = UIColor.orangeColor()
-            self.statusLabel.text = "Found Device..."
+            self.setStatusLabel("Found Device...")
         })
     }
     
