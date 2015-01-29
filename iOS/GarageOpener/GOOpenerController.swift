@@ -61,28 +61,52 @@ class GOOpenerController: UIViewController {
     var config = NSUserDefaults.standardUserDefaults()
     let nc     = NSNotificationCenter.defaultCenter()
     
+    let DEMO  : Bool = true
+    let STATE : States = States.Connected
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.initLabels()
         self.makeButtonCircular()
-        self.updateOpenButtonWait()
-        self.registerObservers()
-        self.setTheme()
-        self.checkAndConfigureAutoTheme()
         
-        self.discovery = BTDiscoveryManager()
+        if DEMO == true {
+            self.setTheme()
+            switch (STATE) {
+            case States.Connected:
+                self.updateOpenButtonNormal()
+                self.setupWithoutAutoTheme()
+                self.setSignalLevel(3)
+                self.activityIndicator.stopAnimating()
+                
+                break
+                
+            case States.Scanning:
+                self.updateOpenButtonScanning()
+                break
+            default:
+                self.updateOpenButtonWait()
+                break
+            }
+            
+        } else {
+        
+            self.updateOpenButtonWait()
+            self.registerObservers()
+            self.setTheme()
+            self.checkAndConfigureAutoTheme()
+        
+            self.discovery = BTDiscoveryManager()
+        }
     }
     
     
     func checkAndConfigureAutoTheme() {
         if self.config.boolForKey("useAutoTheme") == true {
-            println("View: auto theme true - trying to init capture.")
             self.initAutoThemeLabels()
             self.captureCtrl.initializeCaptureSession()
         } else {
-            println("View: Auto Theme disabled")
             self.setupWithoutAutoTheme()
         }
     }
@@ -90,8 +114,22 @@ class GOOpenerController: UIViewController {
     
     func initLabels() {
         self.statusLabel.text   = "Initializing";
-        self.rssiLabel.text     = self.getConnectionBar(0)
         self.lumValueLabel.text = ""
+        
+        self.setSignalLevel(0)
+    }
+    
+    
+    /// updates the rssiLabel with the signal meter number
+    func setSignalLevel(strength: Int) {
+        assert(
+            (strength >= 0 && strength <= 5),
+            "argument strength need to be an Integer between 0 and 5."
+        )
+        
+        if let label = self.rssiLabel {
+            label.text = self.getConnectionBar(strength)
+        }
     }
     
     
@@ -113,18 +151,15 @@ class GOOpenerController: UIViewController {
     
     
     func handleCaptureDeviceNotAuthorized(notification: NSNotification) {
-        println("View: got notified capture is not authorized.")
-        
         config.setBool(false, forKey: "useAutoTheme")
         self.setupWithoutAutoTheme()
+        
         if self.hasShownCameraNotAuthorized == false {
             if (self.isViewLoaded() && (self.view.window != nil)) {
                 self.showCameraNotAuthorizedAlert()
             } else {
                 self.needToShowCameraNotAuthorizedAlert = true
             }
-        } else {
-            println("  - View: alert already shown - not showing again.")
         }
     }
 
@@ -585,12 +620,12 @@ class GOOpenerController: UIViewController {
             else if (msg == "Bluetooth Off") {
                 self.currentState = States.BluetoothOff
                 self.updateOpenButtonWait()
-                self.rssiLabel.text = self.getConnectionBar(0)
+                self.setSignalLevel(0)
             }
             else if (msg == "Scanning") {
                 self.currentState = States.Scanning
                 self.updateOpenButtonScanning()
-                self.rssiLabel.text = self.getConnectionBar(0)
+                self.setSignalLevel(0)
                 self.activityIndicator.startAnimating()
             }
         })
@@ -601,7 +636,7 @@ class GOOpenerController: UIViewController {
         self.currentState = States.DeviceNotFound
         dispatch_async(dispatch_get_main_queue(), {
             self.updateOpenButtonWait()
-            self.rssiLabel.text = self.getConnectionBar(0)
+            self.setSignalLevel(0)
             self.activityIndicator.stopAnimating()
             self.statusLabel.text = "Device Not Found"
             
@@ -676,7 +711,7 @@ class GOOpenerController: UIViewController {
         var strength : Int = Int(ceil(Double(quality) / 20))
         
         dispatch_async(dispatch_get_main_queue(), {
-            self.rssiLabel.text = self.getConnectionBar(strength)
+            self.setSignalLevel(strength)
         })
     }
     
