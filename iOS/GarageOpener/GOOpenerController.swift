@@ -78,11 +78,9 @@ class GOOpenerController: UIViewController {
     
     func checkAndConfigureAutoTheme() {
         if self.config.boolForKey("useAutoTheme") == true {
-            println("View: auto theme true - trying to init capture.")
             self.initAutoThemeLabels()
             self.captureCtrl.initializeCaptureSession()
         } else {
-            println("View: Auto Theme disabled")
             self.setupWithoutAutoTheme()
         }
     }
@@ -113,8 +111,6 @@ class GOOpenerController: UIViewController {
     
     
     func handleCaptureDeviceNotAuthorized(notification: NSNotification) {
-        println("View: got notified capture is not authorized.")
-        
         config.setBool(false, forKey: "useAutoTheme")
         self.setupWithoutAutoTheme()
         if self.hasShownCameraNotAuthorized == false {
@@ -123,8 +119,6 @@ class GOOpenerController: UIViewController {
             } else {
                 self.needToShowCameraNotAuthorizedAlert = true
             }
-        } else {
-            println("  - View: alert already shown - not showing again.")
         }
     }
 
@@ -235,22 +229,8 @@ class GOOpenerController: UIViewController {
     func registerObservers() {
         nc.addObserver(
             self,
-            selector: Selector("appWillResignActive:"),
-            name: UIApplicationWillResignActiveNotification,
-            object: nil
-        )
-        
-        nc.addObserver(
-            self,
             selector: Selector("appWillEnterForeground:"),
             name: UIApplicationWillEnterForegroundNotification,
-            object: nil
-        )
-        
-        nc.addObserver(
-            self,
-            selector: Selector("appDidBecomeActive:"),
-            name: UIApplicationDidBecomeActiveNotification,
             object: nil
         )
         
@@ -305,13 +285,6 @@ class GOOpenerController: UIViewController {
         
         nc.addObserver(
             self,
-            selector: Selector("handleSettingsCancelled"),
-            name: "SettingsCancelledNotification",
-            object: nil
-        )
-        
-        nc.addObserver(
-            self,
             selector: "handleLightLevelUpdate:",
             name: "GOCaptureCalculatedLightLevelNotification",
             object: nil
@@ -337,22 +310,11 @@ class GOOpenerController: UIViewController {
     //  App activity notifications
     //
     
-    func appWillResignActive(notification: NSNotification) {
-        println("App will resign active")
-    }
-    
-    
-    func appDidBecomeActive(notification: NSNotification) {
-        println("App did become active")
-    }
-    
     func appWillEnterForeground(notification: NSNotification) {
-        println("GOOpener: App will enter foreground.")
         self.checkAndConfigureAutoTheme()
     }
     
     func appDidEnterBackground(notification: NSNotification) {
-        println("GOOpener: App did enter background")
         self.updateOpenButtonWait()
         self.captureCtrl.removeImageCaptureTimer()
         self.captureCtrl.endCaptureSession()
@@ -364,7 +326,6 @@ class GOOpenerController: UIViewController {
     //
     
     func handleSettingsUpdated() {
-        println("View:  told settings have updated")
         self.setTheme()
         
         if self.config.boolForKey("useAutoTheme") == true {
@@ -372,12 +333,6 @@ class GOOpenerController: UIViewController {
         } else {
             self.setupWithoutAutoTheme()
         }
-    }
-    
-    
-    func handleSettingsCancelled() {
-        println("View told settings was cancelled")
-        
     }
     
     ///////////////////////////////////////////////////////////////////////
@@ -422,7 +377,6 @@ class GOOpenerController: UIViewController {
         }
         
         if self.currentState == States.DeviceNotFound {
-            NSLog("GOOpener: button pressed: state: device not found")
             if let discovery = self.discovery {
                 discovery.startScanning()
             }
@@ -443,50 +397,33 @@ class GOOpenerController: UIViewController {
                         forCharacteristic: rx,
                         type: CBCharacteristicWriteType.WithoutResponse
                     )
-                } else {
-                    println("Did not find valid password, so not writing anything")
                 }
             }
         }
     }
     
     func getActivePeripheral() -> CBPeripheral? {
-        if self.discovery == nil {
-            println("  Could not find discovery object.")
-            return nil
+        if self.discovery == nil { return nil }
+        
+        if let peripheral = self.discovery!.activePeripheral {
+            if peripheral.state != CBPeripheralState.Connected { return nil }
+            return peripheral
         }
         
-        let peripheral = self.discovery!.activePeripheral
-        if peripheral == nil {
-            println("  Did not get active peripheral.")
-            return nil
-        }
-        
-        if peripheral?.state != CBPeripheralState.Connected {
-            println("  Peripheral apparently is not connected.")
-            return nil
-        }
-
-        return peripheral
+        return nil
     }
     
+    
     func getRXCharacteristic() -> CBCharacteristic? {
-        let peripheral = self.getActivePeripheral()
-        if peripheral == nil { return nil }
-        
-        let service = self.discovery?.activeService
-        if service == nil {
-            println("  Did not get active service.")
-            return nil
+        if let peripheral = self.getActivePeripheral() {
+            if let service = self.discovery?.activeService {
+                if let rx = service.rxCharacteristic {
+                    return rx
+                }
+            }
         }
         
-        let rx = service?.rxCharacteristic
-        if (rx == nil) {
-            println("  Did not get rx characteristic")
-            return nil
-        }
-        
-        return rx
+        return nil
     }
     
     
@@ -545,14 +482,13 @@ class GOOpenerController: UIViewController {
         )
 
         
-        openButton.setTitle("Start", forState: UIControlState.Normal)
+        openButton.setTitle("Connect", forState: UIControlState.Normal)
     }
     
+    /// Updates the button to make size and layout is correct.
     func makeButtonCircular() {
-        openButton.frame = CGRectMake(0, 0, 180, 180);
-        openButton.clipsToBounds = true;
-        
-        println("Circular button: \(openButton.frame.size.width) x \(openButton.frame.size.height)")
+        openButton.frame              = CGRectMake(0, 0, 180, 180);
+        openButton.clipsToBounds      = true;
         openButton.layer.cornerRadius = 90
     }
     
@@ -563,8 +499,6 @@ class GOOpenerController: UIViewController {
     /// :returns: nil
     func btStateChanged(notification: NSNotification) {
         var msg = notification.object as String
-        
-        NSLog("GOOpener: bt state changed: got notification: \(msg)")
         
         dispatch_async(dispatch_get_main_queue(), {
             if (msg.hasPrefix("Low Signal")) {
@@ -607,7 +541,7 @@ class GOOpenerController: UIViewController {
             
             self.delay(2.0) {
                 self.updateOpenButtonStartScan()
-                self.statusLabel.text = "Scan Finished"
+                self.statusLabel.text = "Not Connected"
             }
         })
     }
@@ -615,8 +549,6 @@ class GOOpenerController: UIViewController {
     
     /// Handler for the connection.
     func btConnectionChanged(notification: NSNotification) {
-        println("got connection changed notification: \(notification)")
-        
         let info = notification.userInfo as [String: AnyObject]
         var name = info["name"]          as NSString
         
@@ -639,8 +571,6 @@ class GOOpenerController: UIViewController {
     }
     
     func btFoundDevice(notification: NSNotification) {
-        println("got found device notification: \(notification)")
-        
         let info       = notification.userInfo as [String: AnyObject]
         var peripheral = info["peripheral"]    as CBPeripheral
         var rssi       = info["RSSI"]          as NSNumber
@@ -668,7 +598,6 @@ class GOOpenerController: UIViewController {
         var rssi : NSNumber! = info["rssi"]
         
         if peripheral.state != CBPeripheralState.Connected {
-            println("  peripheral state says not connected!")
             return
         }
         
