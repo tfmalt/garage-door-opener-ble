@@ -62,7 +62,7 @@ class GOOpenerController: UIViewController {
     let nc     = NSNotificationCenter.defaultCenter()
     
     let DEMO  : Bool = true
-    let STATE : States = States.Connected
+    let STATE : States = States.Scanning
     
     
     override func viewDidLoad() {
@@ -79,11 +79,13 @@ class GOOpenerController: UIViewController {
                 self.setupWithoutAutoTheme()
                 self.setSignalLevel(3)
                 self.activityIndicator.stopAnimating()
-                
+                self.setStatusLabel("Connected to Home")
                 break
                 
             case States.Scanning:
                 self.updateOpenButtonScanning()
+                self.setupWithoutAutoTheme()
+                self.setStatusLabel("Scanning")
                 break
             default:
                 self.updateOpenButtonWait()
