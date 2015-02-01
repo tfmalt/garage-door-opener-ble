@@ -34,7 +34,6 @@ class GOOpenerController: UIViewController {
     @IBOutlet weak var lumValueLabel: UILabel!
     @IBOutlet weak var lumLabel: UILabel!
     
-    // let Colors            = GOOpenerColors()
     let AnimationDuration = 0.5
     
     // An enum to keep track of the application states defined.
@@ -61,7 +60,7 @@ class GOOpenerController: UIViewController {
     var config = NSUserDefaults.standardUserDefaults()
     let nc     = NSNotificationCenter.defaultCenter()
     
-    let DEMO  : Bool = true
+    let DEMO  : Bool = false
     let STATE : States = States.Scanning
     
     
@@ -73,6 +72,7 @@ class GOOpenerController: UIViewController {
         
         if DEMO == true {
             self.setTheme()
+            
             switch (STATE) {
             case States.Connected:
                 self.updateOpenButtonNormal()
@@ -621,11 +621,7 @@ class GOOpenerController: UIViewController {
         }
     }
     
-<<<<<<< HEAD
     func btFoundDevice(notification: NSNotification) {
-=======
-    func btFoundDevice(notification: NSNotification) {        
->>>>>>> demo-mock
         let info       = notification.userInfo as [String: AnyObject]
         var peripheral = info["peripheral"]    as CBPeripheral
         var rssi       = info["RSSI"]          as NSNumber
