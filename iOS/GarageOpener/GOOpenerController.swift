@@ -15,14 +15,14 @@ var captureCtrl : GOCaptureController = GOCaptureController()
 
 // Struct containing the colors I use.
 struct GOOpenerColors {
-    let wait              = UIColor.colorWithHex("#D00000")!
-    let waitHighlight     = UIColor.colorWithHex("#D00000")!
-    let open              = UIColor.colorWithHex("#33BB33")!
-    let openHighlight     = UIColor.colorWithHex("#208840")!
-    let scanning          = UIColor.colorWithHex("#D00000")!
-    let scanningHighlight = UIColor.colorWithHex("#D00000")!
-    let start             = UIColor.colorWithHex("#1080C0")! //  FFAA00
-    let startHighlight    = UIColor.colorWithHex("#0C4778")! // 0C4778 FFDD00
+    static let wait              = UIColor.colorWithHex("#D00000")!
+    static let waitHighlight     = UIColor.colorWithHex("#D00000")!
+    static let open              = UIColor.colorWithHex("#33BB33")!
+    static let openHighlight     = UIColor.colorWithHex("#208840")!
+    static let scanning          = UIColor.colorWithHex("#D00000")!
+    static let scanningHighlight = UIColor.colorWithHex("#D00000")!
+    static let start             = UIColor.colorWithHex("#1080C0")! //  FFAA00
+    static let startHighlight    = UIColor.colorWithHex("#0C4778")! // 0C4778 FFDD00
 }
 
 
@@ -35,7 +35,7 @@ class GOOpenerController: UIViewController {
     @IBOutlet weak var lumLabel: UILabel!
     
     let Colors            = GOOpenerColors()
-    let animationDuration = 1.0
+    let AnimationDuration = 0.5
     
     // An enum to keep track of the application states defined.
     enum States {
@@ -176,7 +176,7 @@ class GOOpenerController: UIViewController {
     
     
     func setDarkThemeAnimated() {
-        UIView.animateWithDuration(1.0, animations: {
+        UIView.animateWithDuration(AnimationDuration, animations: {
             self.view.backgroundColor = UIColor.blackColor()
         })
             
@@ -186,7 +186,7 @@ class GOOpenerController: UIViewController {
     
     
     func setLightThemeAnimated() {
-        UIView.animateWithDuration(1.0, animations: {
+        UIView.animateWithDuration(AnimationDuration, animations: {
             self.view.backgroundColor = UIColor.whiteColor()
         })
         
@@ -311,6 +311,7 @@ class GOOpenerController: UIViewController {
     //
     
     func appWillEnterForeground(notification: NSNotification) {
+        self.updateOpenButtonWait()
         self.checkAndConfigureAutoTheme()
     }
     
@@ -429,7 +430,7 @@ class GOOpenerController: UIViewController {
     
     func updateOpenButtonWait() {
         
-        UIView.animateWithDuration(1.0, animations: {
+        UIView.animateWithDuration(AnimationDuration, animations: {
             self.openButton.backgroundColor = self.Colors.wait
         })
         
@@ -444,7 +445,7 @@ class GOOpenerController: UIViewController {
     
     func updateOpenButtonNormal() {
         
-        UIView.animateWithDuration(1.0, animations: {
+        UIView.animateWithDuration(AnimationDuration, animations: {
             self.openButton.backgroundColor = self.Colors.open
         })
         
@@ -458,7 +459,7 @@ class GOOpenerController: UIViewController {
     
     func updateOpenButtonScanning() {
         
-        UIView.animateWithDuration(1.0, animations: {
+        UIView.animateWithDuration(AnimationDuration, animations: {
             self.openButton.backgroundColor = self.Colors.scanning
         })
         
@@ -472,7 +473,7 @@ class GOOpenerController: UIViewController {
     
     func updateOpenButtonStartScan() {
         
-        UIView.animateWithDuration(1.0, animations: {
+        UIView.animateWithDuration(AnimationDuration, animations: {
             self.openButton.backgroundColor = self.Colors.start
         })
         
