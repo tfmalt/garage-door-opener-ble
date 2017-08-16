@@ -16,8 +16,8 @@ class GOSettingsController : UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var darkThemeSwitch: UISwitch!
     @IBOutlet weak var themeAutoSwitch: UISwitch!
     
-    var config = NSUserDefaults.standardUserDefaults()
-    var nc     = NSNotificationCenter.defaultCenter()
+    var config = UserDefaults.standard
+    var nc     = NotificationCenter.default
     
     
     override func viewDidLoad() {
@@ -25,8 +25,8 @@ class GOSettingsController : UITableViewController, UITextFieldDelegate {
         
         nc.addObserver(
             self,
-            selector: "handleCaptureDeviceNotAuthorized:",
-            name: "GOCaptureDeviceNotAuthorizedNotification",
+            selector: #selector(GOSettingsController.handleCaptureDeviceNotAuthorized(_:)),
+            name: Notification.Name(rawValue: "GOCaptureDeviceNotAuthorizedNotification"),
             object: nil
         )
         
@@ -35,85 +35,85 @@ class GOSettingsController : UITableViewController, UITextFieldDelegate {
         tableView.separatorColor = UIColor.colorWithHex("#cccccc")
         self.configureSettings()
         
-        println("Loaded settings controller")
+        print("Loaded settings controller")
     }
     
     /// Setting up the switches to default
     func configureSettings() {
-        if let show = config.valueForKey("showPassword") as? Bool {
-            showPasswordSwitch.on = show
+        if let show = config.value(forKey: "showPassword") as? Bool {
+            showPasswordSwitch.isOn = show
         }
         
-        if let pass = config.valueForKey("password") as? String {
+        if let pass = config.value(forKey: "password") as? String {
             passwordField.text = pass
         }
         
-        if let darkOn = config.valueForKey("useDarkTheme") as? Bool {
-            darkThemeSwitch.on = darkOn
+        if let darkOn = config.value(forKey: "useDarkTheme") as? Bool {
+            darkThemeSwitch.isOn = darkOn
         }
         
-        if let autoOn = config.valueForKey("useAutoTheme") as? Bool {
-            themeAutoSwitch.on = autoOn
+        if let autoOn = config.value(forKey: "useAutoTheme") as? Bool {
+            themeAutoSwitch.isOn = autoOn
         }
         
-        passwordField.secureTextEntry = !showPasswordSwitch.on
+        passwordField.isSecureTextEntry = !showPasswordSwitch.isOn
     }
     
     
-    @IBAction func handleDarkThemeChange(sender: UISwitch) {
-        config.setBool(sender.on, forKey: "useDarkTheme")
+    @IBAction func handleDarkThemeChange(_ sender: UISwitch) {
+        config.set(sender.isOn, forKey: "useDarkTheme")
     }
     
-    @IBAction func handleAutoThemeChange(sender: UISwitch) {
-        config.setBool(sender.on, forKey: "useAutoTheme")
+    @IBAction func handleAutoThemeChange(_ sender: UISwitch) {
+        config.set(sender.isOn, forKey: "useAutoTheme")
         
-        if sender.on == true {
-            nc.postNotificationName(
-                "GOSettingsRequestCameraAccessNotification",
+        if sender.isOn == true {
+            nc.post(
+                name: Notification.Name(rawValue: "GOSettingsRequestCameraAccessNotification"),
                 object: config
             )
         }
     }
     
 
-    @IBAction func handleShowPasswordChange(sender: UISwitch) {
-        passwordField.secureTextEntry = !sender.on
-        config.setBool(sender.on, forKey: "showPassword")
+    @IBAction func handleShowPasswordChange(_ sender: UISwitch) {
+        passwordField.isSecureTextEntry = !sender.isOn
+        config.set(sender.isOn, forKey: "showPassword")
     }
     
     /// Store password and notify main view when done is pressed
-    @IBAction func handleDonePressed(sender: AnyObject) {
-        config.setObject(passwordField.text, forKey: "password")
+    @IBAction func handleDonePressed(_ sender: AnyObject) {
+        config.set(passwordField.text, forKey: "password")
         
         self.passwordField.resignFirstResponder()
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
         
-        nc.postNotificationName("SettingsUpdatedNotification", object: config)
+        nc.post(name: Notification.Name(rawValue: "SettingsUpdatedNotification"), object: config)
     }
     
     
     /// Post notification to main view when cancel is pressed
-    @IBAction func handleCancelPressed(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func handleCancelPressed(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
         self.passwordField.resignFirstResponder()
         
-        nc.postNotificationName("SettingsCancelledNotification", object: config)
+        nc.post(name: Notification.Name(rawValue: "SettingsCancelledNotification"), object: config)
     }
     
     
-    func handleCaptureDeviceNotAuthorized(notification: NSNotification) {
-        var captureCtrl = notification.object as GOCaptureController
+    func handleCaptureDeviceNotAuthorized(_ notification: Notification) {
+        let captureCtrl = notification.object as! GOCaptureController
         
-        println("Settings: Got notification capture not authorized")
-        if (self.isViewLoaded() && (self.view.window != nil)) {
+        print("Settings: Got notification capture not authorized")
+        if (self.isViewLoaded && (self.view.window != nil)) {
             let alert = captureCtrl.getCameraNotAuthorizedAlert()
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
         }
         
-        dispatch_async(dispatch_get_main_queue(), {
-            println("  - Setting auto theme = false")
-            self.config.setBool(false, forKey: "useAutoTheme")
-            self.themeAutoSwitch.on = false
+        DispatchQueue.main.async(execute: {
+            print("  - Setting auto theme = false")
+            self.config.set(false, forKey: "useAutoTheme")
+            self.themeAutoSwitch.isOn = false
         })
         
     }
@@ -123,8 +123,8 @@ class GOSettingsController : UITableViewController, UITextFieldDelegate {
     /// standard settings view in the settings app
     ///
     /// :return: UIView
-    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = UIView(frame: CGRectMake(0, 0, tableView.frame.size.width, 28))
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let header = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 28))
 
         header.backgroundColor = UIColor.colorWithHex("#EEEEEE")
         
@@ -133,7 +133,7 @@ class GOSettingsController : UITableViewController, UITextFieldDelegate {
             let text   : UILabel = self.getLabel()
             let border : CALayer = self.getBottomBorder()
             
-            text.text = String("authentication").uppercaseString
+            text.text = String("authentication").uppercased()
             
             header.addSubview(text)
             header.layer.addSublayer(border)
@@ -143,7 +143,7 @@ class GOSettingsController : UITableViewController, UITextFieldDelegate {
             let text   : UILabel = self.getLabel()
             let border : CALayer = self.getBottomBorder()
             
-            text.text = String("Theme").uppercaseString
+            text.text = String("Theme").uppercased()
             
             header.addSubview(text)
             header.layer.addSublayer(border)
@@ -155,14 +155,14 @@ class GOSettingsController : UITableViewController, UITextFieldDelegate {
     
     /// Iterates over the tableview sections and updates all the footers
     /// to look nice
-    override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        let footer = UIView(frame: CGRectMake(0, 0, tableView.frame.size.width, 40));
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footer = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 40));
         footer.backgroundColor = UIColor.colorWithHex("#EEEEEE")
         
         if (section == 1 || section == 2) {
             let border = CALayer();
-            border.frame = CGRectMake(0, 0, tableView.frame.size.width, 0.5)
-            border.backgroundColor = UIColor.colorWithHex("#CCCCCC")?.CGColor
+            border.frame = CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 0.5)
+            border.backgroundColor = UIColor.colorWithHex("#CCCCCC")?.cgColor
             
             footer.layer.addSublayer(border)
         }
@@ -176,8 +176,8 @@ class GOSettingsController : UITableViewController, UITextFieldDelegate {
     func getBottomBorder() -> CALayer {
         let border = CALayer();
         
-        border.frame = CGRectMake(0, 22, tableView.frame.size.width, 0.5)
-        border.backgroundColor = UIColor.colorWithHex("#CCCCCC")?.CGColor
+        border.frame = CGRect(x: 0, y: 22, width: tableView.frame.size.width, height: 0.5)
+        border.backgroundColor = UIColor.colorWithHex("#CCCCCC")?.cgColor
         
         return border
     }
@@ -186,18 +186,18 @@ class GOSettingsController : UITableViewController, UITextFieldDelegate {
     /// Helper function to draw the tableview cells the way I want.
     func getLabel() -> UILabel {
         let text = UILabel(
-            frame: CGRectMake(18, -4 ,
-            tableView.frame.size.width, 28)
+            frame: CGRect(x: 18, y: -4 ,
+            width: tableView.frame.size.width, height: 28)
         )
         
-        text.font = UIFont.systemFontOfSize(14.0)
+        text.font = UIFont.systemFont(ofSize: 14.0)
         text.textColor = UIColor.colorWithHex("#666666")
         
         return text
     }
     
     /// Makes the textfield disappear
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }

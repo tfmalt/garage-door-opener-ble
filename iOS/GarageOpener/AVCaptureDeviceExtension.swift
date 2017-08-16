@@ -16,10 +16,10 @@ extension AVCaptureDevice {
     /// There is probably only one camera like that on a device, and
     /// if there are several the first found will be good engugh.
     class func deviceWithVideoInFront() -> AVCaptureDevice? {
-        let devices = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo)
+        let devices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo)
         
-        for device in devices {
-            if device.position == AVCaptureDevicePosition.Front {
+        for device in devices! {
+            if (device as AnyObject).position == AVCaptureDevicePosition.front {
                 return device as? AVCaptureDevice
             }
         }

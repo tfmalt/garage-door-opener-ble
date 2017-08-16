@@ -11,36 +11,36 @@ import UIKit
 
 extension UIColor {
     
-    class func colorWithHex(hexString: String?) -> UIColor? {
+    class func colorWithHex(_ hexString: String?) -> UIColor? {
         
         return colorWithHex(hexString, alpha: 1.0)
     }
     
-    class func colorWithHex(hexString: String?, alpha: CGFloat) -> UIColor? {
+    class func colorWithHex(_ hexString: String?, alpha: CGFloat) -> UIColor? {
         
         if let hexString = hexString {
             
             var error : NSError? = nil
             
-            let regexp = NSRegularExpression(pattern: "\\A#[0-9a-f]{6}\\z",
-                options: .CaseInsensitive,
-                error: &error)
-            
-            let count = regexp?.numberOfMatchesInString(hexString,
-                options: .ReportProgress,
-                range: NSMakeRange(0, countElements(hexString)))
-            
-            if count != 1 {
-                
-                return nil
-            }
+//            let regexp = NSRegularExpression(pattern: "\\A#[0-9a-f]{6}\\z",
+//                options: .CaseInsensitive,
+//                error: &error)
+//            
+//            let count = regexp?.numberOfMatchesInString(hexString,
+//                options: .ReportProgress,
+//                range: NSMakeRange(0, hexString.count))
+//            
+//            if count != 1 {
+//                
+//                return nil
+//            }
             
             var rgbValue : UInt32 = 0
             
-            let scanner = NSScanner(string: hexString)
+            let scanner = Scanner(string: hexString)
             
             scanner.scanLocation = 1
-            scanner.scanHexInt(&rgbValue)
+            scanner.scanHexInt32(&rgbValue)
             
             let red   = CGFloat( (rgbValue & 0xFF0000) >> 16) / 255.0
             let green = CGFloat( (rgbValue & 0xFF00) >> 8) / 255.0

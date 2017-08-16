@@ -17,7 +17,7 @@ class BTService : NSObject, CBPeripheralDelegate {
     
     let btConst = BTConstants()
 
-    private let nc = NSNotificationCenter.defaultCenter()
+    fileprivate let nc = NotificationCenter.default
     
     init(initWithPeripheral peripheral: CBPeripheral) {
         super.init()
@@ -37,22 +37,23 @@ class BTService : NSObject, CBPeripheralDelegate {
     }
     
     func startDiscoveringServices() {
-        println("Starting discover services")
+        print("Starting discover services")
         
         if let peri = self.peripheral {
             peri.discoverServices([CBUUID(string: btConst.SERVICE_UUID)])
         }
     }
     
-    func sendNotificationIsConnected(connected: Bool) {
+    func sendNotificationIsConnected(_ connected: Bool) {
         if let peripheral = self.peripheral {
-            nc.postNotificationName(
-                "btConnectionChangedNotification",
-                object: self,
-                userInfo: [
-                    "isConnected": connected,
-                    "name": peripheral.name
-                ]
+            nc.post(
+                name: Notification.Name(rawValue: "btConnectionChangedNotification"),
+                object: self
+//                ,
+//                userInfo: [
+//                    "isConnected": connected,
+//                    "name": peripheral.name
+//                ]
             )
         }
     }
@@ -64,36 +65,36 @@ class BTService : NSObject, CBPeripheralDelegate {
     // Did Discover Characteristics for Service
     // 
     // Adds the two characteristics to the object for easy retrival
-    func peripheral(peripheral: CBPeripheral!, didDiscoverCharacteristicsForService service: CBService!, error: NSError!) {
-        println("got did discover characteristics for service")
-        for cha in service.characteristics {
-            if cha.UUID == CBUUID(string: btConst.CHAR_TX_UUID) {
+    func peripheral(_ peripheral: CBPeripheral!, didDiscoverCharacteristicsFor service: CBService!, error: Error!) {
+        print("got did discover characteristics for service")
+        for cha in service.characteristics! {
+            if cha.uuid == CBUUID(string: btConst.CHAR_TX_UUID) {
                 self.txCharacteristic = (cha as CBCharacteristic)
             }
-            else if cha.UUID == CBUUID(string: btConst.CHAR_RX_UUID) {
+            else if cha.uuid == CBUUID(string: btConst.CHAR_RX_UUID) {
                 self.rxCharacteristic = (cha as CBCharacteristic)
             }
             else {
-                println("  Found unexpected characteristic: \(cha)")
+                print("  Found unexpected characteristic: \(cha)")
                 return
             }
             
-            peripheral.setNotifyValue(true, forCharacteristic: cha as CBCharacteristic)
+            peripheral.setNotifyValue(true, for: cha as CBCharacteristic)
         }
         
         self.sendNotificationIsConnected(true)
     }
     
-    func peripheral(peripheral: CBPeripheral!, didDiscoverDescriptorsForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        println("got did discover descriptors for characteristic")
+    func peripheral(_ peripheral: CBPeripheral!, didDiscoverDescriptorsFor characteristic: CBCharacteristic!, error: Error!) {
+        print("got did discover descriptors for characteristic")
     }
     
-    func peripheral(peripheral: CBPeripheral!, didDiscoverIncludedServicesForService service: CBService!, error: NSError!) {
-        println("got did discover included services for service")
+    func peripheral(_ peripheral: CBPeripheral!, didDiscoverIncludedServicesFor service: CBService!, error: Error!) {
+        print("got did discover included services for service")
 
     }
     
-    func peripheral(peripheral: CBPeripheral!, didDiscoverServices error: NSError!) {
+    func peripheral(_ peripheral: CBPeripheral!, didDiscoverServices error: Error!) {
         // array of the two available characteristics.
         let cUUIDs : [CBUUID] = [
             CBUUID(string: btConst.CHAR_RX_UUID),
@@ -101,73 +102,73 @@ class BTService : NSObject, CBPeripheralDelegate {
         ]
         
         if (error != nil) {
-            println("got error: a surprise: \(error)")
+            print("got error: a surprise: \(error)")
             return
         }
         
         // Sometimes services has been reported as nil. testing for that.
-        if ((peripheral.services == nil) || (peripheral.services.count == 0)) {
-            println("Got no services!")
+        if ((peripheral.services == nil) || (peripheral.services?.count == 0)) {
+            print("Got no services!")
             return
         }
 
-        for service in peripheral.services {
-            if (service.UUID == CBUUID(string: btConst.SERVICE_UUID)) {
-                peripheral.discoverCharacteristics(cUUIDs, forService: service as CBService)
+        for service in peripheral.services! {
+            if (service.uuid == CBUUID(string: btConst.SERVICE_UUID)) {
+                peripheral.discoverCharacteristics(cUUIDs, for: service as CBService)
             }
         }
     }
     
-    func peripheral(peripheral: CBPeripheral!, didModifyServices invalidatedServices: [AnyObject]!) {
-        println("got did modify services")
+    func peripheral(_ peripheral: CBPeripheral!, didModifyServices invalidatedServices: [AnyObject]!) {
+        print("got did modify services")
 
     }
     
-    func peripheral(peripheral: CBPeripheral!, didReadRSSI RSSI: NSNumber!, error: NSError!) {
-        // println("got did read rssi: \(RSSI)")
+    func peripheral(_ peripheral: CBPeripheral!, didReadRSSI RSSI: NSNumber!, error: Error!) {
+        // print("got did read rssi: \(RSSI)")
         
-        if peripheral.state != CBPeripheralState.Connected {
-            println("  Peripheral state says not connected.")
+        if peripheral.state != CBPeripheralState.connected {
+            print("  Peripheral state says not connected.")
             return
         }
         
-        nc.postNotificationName(
-            "btRSSIUpdateNotification",
+        nc.post(
+            name: Notification.Name(rawValue: "btRSSIUpdateNotification"),
             object: peripheral,
             userInfo: ["rssi": RSSI]
         )
     }
     
-    func peripheral(peripheral: CBPeripheral!, didUpdateNotificationStateForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        println("got did update notification state for characteristic")
+    func peripheral(_ peripheral: CBPeripheral!, didUpdateNotificationStateFor characteristic: CBCharacteristic!, error: Error!) {
+        print("got did update notification state for characteristic")
 
     }
     
-    func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        println("got did update value for characteristic")
+    func peripheral(_ peripheral: CBPeripheral!, didUpdateValueFor characteristic: CBCharacteristic!, error: Error!) {
+        print("got did update value for characteristic")
     }
     
-    func peripheral(peripheral: CBPeripheral!, didUpdateValueForDescriptor descriptor: CBDescriptor!, error: NSError!) {
-        println("got did update value for descriptor")
+    func peripheral(_ peripheral: CBPeripheral!, didUpdateValueFor descriptor: CBDescriptor!, error: Error!) {
+        print("got did update value for descriptor")
     }
     
-    func peripheral(peripheral: CBPeripheral!, didWriteValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        println("got did write value for characteristic")
+    func peripheral(_ peripheral: CBPeripheral!, didWriteValueFor characteristic: CBCharacteristic!, error: Error!) {
+        print("got did write value for characteristic")
     }
     
-    func peripheral(peripheral: CBPeripheral!, didWriteValueForDescriptor descriptor: CBDescriptor!, error: NSError!) {
-        println("got did write value for descriptor")
+    func peripheral(_ peripheral: CBPeripheral!, didWriteValueFor descriptor: CBDescriptor!, error: Error!) {
+        print("got did write value for descriptor")
     }
     
-    func peripheralDidInvalidateServices(peripheral: CBPeripheral!) {
-        println("got peripheral did invalidate services")
+    func peripheralDidInvalidateServices(_ peripheral: CBPeripheral!) {
+        print("got peripheral did invalidate services")
     }
     
-    func peripheralDidUpdateName(peripheral: CBPeripheral!) {
-        println("got peripheral did update name")
+    func peripheralDidUpdateName(_ peripheral: CBPeripheral!) {
+        print("got peripheral did update name")
     }
     
-    func peripheralDidUpdateRSSI(peripheral: CBPeripheral!, error: NSError!) {
-        println("Got peripheral did update rssi")
+    func peripheralDidUpdateRSSI(_ peripheral: CBPeripheral!, error: Error!) {
+        print("Got peripheral did update rssi")
     }
 }

@@ -13,9 +13,9 @@ extension UIImage {
     
     /// A function pulled of StackOverflow to create an empty image from 
     /// a hex rgb code
-    class func imageWithColor(color:UIColor?) -> UIImage! {
+    class func imageWithColor(_ color:UIColor?) -> UIImage! {
         
-        let rect = CGRectMake(0.0, 0.0, 1.0, 1.0);
+        let rect = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0);
         
         UIGraphicsBeginImageContextWithOptions(rect.size, false, 0)
         
@@ -27,10 +27,10 @@ extension UIImage {
         }
         else {
             
-            UIColor.whiteColor().setFill()
+            UIColor.white.setFill()
         }
         
-        CGContextFillRect(context, rect);
+        context?.fill(rect);
         
         let image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
@@ -41,16 +41,16 @@ extension UIImage {
     /// Returns the uicolor for a given pixel
     ///
     /// :return: UIColor
-    func getPixelColor(pos: CGPoint!) -> UIColor {
-        let pixelData : CFDataRef = CGDataProviderCopyData(CGImageGetDataProvider(self.CGImage))
+    func getPixelColor(_ pos: CGPoint!) -> UIColor {
+        let pixelData : CFData = (self.cgImage)!.dataProvider!.data!
         let data      : UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
         let pixelInfo : Int = ((Int(self.size.width) * Int(pos.y)) + Int(pos.x)) * 4
         let depth     : CGFloat = CGFloat(255.0)
         
-        var r = CGFloat(data[pixelInfo + 0]) / depth
-        var g = CGFloat(data[pixelInfo + 1]) / depth
-        var b = CGFloat(data[pixelInfo + 2]) / depth
-        var a = CGFloat(data[pixelInfo + 3]) / depth
+        let r = CGFloat(data[pixelInfo + 0]) / depth
+        let g = CGFloat(data[pixelInfo + 1]) / depth
+        let b = CGFloat(data[pixelInfo + 2]) / depth
+        let a = CGFloat(data[pixelInfo + 3]) / depth
         
         return UIColor(red: r, green: g, blue: b, alpha: a)
     }
@@ -59,8 +59,8 @@ extension UIImage {
     ///
     /// :param: pos CGPoint
     /// :return: Array [CGFloat]
-    func getPixelRGB(pos: CGPoint) -> [CGFloat] {
-        let pixelData : CFDataRef = CGDataProviderCopyData(CGImageGetDataProvider(self.CGImage))
+    func getPixelRGB(_ pos: CGPoint) -> [CGFloat] {
+        let pixelData : CFData = (self.cgImage)!.dataProvider!.data!
         let data      : UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
         let pixelInfo : Int = ((Int(self.size.width) * Int(pos.y)) + Int(pos.x)) * 4
         let depth     : CGFloat = CGFloat(255.0)
@@ -76,21 +76,21 @@ extension UIImage {
     ///
     /// :return: CGFloat
     func luminance() -> CGFloat {
-        let pixelData : CFDataRef = CGDataProviderCopyData(CGImageGetDataProvider(self.CGImage))
+        let pixelData : CFData = (self.cgImage)!.dataProvider!.data!
         let data      : UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
         var total     : CGFloat   = 0.0
         let width     : Int       = Int(self.size.width)
         let height    : Int       = Int(self.size.height)
         
-        for var i = 0; i < width; i++ {
-            for var j = 0; j < height; j++ {
+        for i in 0 ..< width {
+            for j in 0 ..< height {
                 
                 let pixelInfo : Int = (((width * j) + i) * 4)
                 let depth     : CGFloat = CGFloat(255.0)
                 
-                var r = CGFloat(data[pixelInfo + 0]) / depth
-                var g = CGFloat(data[pixelInfo + 1]) / depth
-                var b = CGFloat(data[pixelInfo + 2]) / depth
+                let r = CGFloat(data[pixelInfo + 0]) / depth
+                let g = CGFloat(data[pixelInfo + 1]) / depth
+                let b = CGFloat(data[pixelInfo + 2]) / depth
                 
                 total += (r * CGFloat(0.299))
                 total += (g * CGFloat(0.587))
@@ -98,7 +98,7 @@ extension UIImage {
             }
         }
         
-        var luminance = (total / (self.size.width*self.size.height))
+        let luminance = (total / (self.size.width*self.size.height))
         
         return luminance
     }
